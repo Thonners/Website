@@ -20,6 +20,41 @@ mtCaption =
     "<Insert witty caption here>"
 
 
+backgroundImagePath : String
+backgroundImagePath =
+    "../assets/images/IMG_20161126_162719.jpg"
+
+
+type alias Icon =
+    { filename : String, link : String }
+
+
+icons : List Icon
+icons =
+    [ { filename = "crosswordtoolkit.webp"
+      , link = "https://play.google.com/store/apps/details?id=com.thonners.crosswordmaker"
+      }
+    , { filename = "github.svg"
+      , link = "https://github.com/Thonners"
+      }
+    ]
+
+
+fullIconPath : String -> String
+fullIconPath filename =
+    String.append iconRoot filename
+
+
+iconSize : Int
+iconSize =
+    50
+
+
+iconRoot : String
+iconRoot =
+    "../assets/icons/"
+
+
 type Status
     = InitialStatus
 
@@ -67,7 +102,49 @@ subcaptionView =
 
 textView : Element msg
 textView =
-    column [ alignBottom, paddingXY 500 50, spacing 3 ] [ nameView, subcaptionView ]
+    column
+        [ alignBottom
+        , paddingXY 500 50
+        , spacing 3
+        ]
+        [ nameView, subcaptionView ]
+
+
+linksView : Element msg
+linksView =
+    column
+        [ alignRight
+        , paddingXY 10 200
+        , spacing 10
+        , alignTop
+        ]
+        (List.map
+            (\icon ->
+                newTabLink []
+                    { url = icon.link
+                    , label =
+                        image
+                            [ width <| px iconSize
+                            , height <| px iconSize
+                            ]
+                            { src = fullIconPath icon.filename
+                            , description = ""
+                            }
+                    }
+            )
+            icons
+        )
+
+
+wrapperView : Element msg
+wrapperView =
+    row
+        [ height fill
+        , width fill
+        ]
+        [ textView
+        , linksView
+        ]
 
 
 view : Model -> Html Msg
@@ -75,7 +152,7 @@ view model =
     layout
         [ height fill
         , width fill
-        , Background.image "../assets/images/IMG_20161126_162719.jpg"
+        , Background.image backgroundImagePath
         , Font.color <| rgb255 255 255 255
         ]
-        textView
+        wrapperView
