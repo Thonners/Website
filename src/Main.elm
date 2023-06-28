@@ -35,9 +35,9 @@ type Msg
 
 main : Program () Model Msg
 main =
-    Browser.element
+    Browser.document
         { init = \flags -> ( { status = InitialStatus }, Cmd.none )
-        , view = view
+        , view = \model -> { title = "Mathonwy Thomas", body = [ view model ] }
         , update = update
         , subscriptions = \model -> Sub.none
         }
