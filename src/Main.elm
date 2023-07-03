@@ -90,6 +90,7 @@ type State
 animator : Animator.Animator Model
 animator =
     Animator.animator
+        -- Tutorial: https://korban.net/posts/elm/2020-04-07-using-elm-animator-with-elm-ui/
         |> Animator.watchingWith
             -- we tell the animator how
             -- to get the linkButtonStates timeline using .linkButtonStates
@@ -211,7 +212,12 @@ linksView model =
         , alignTop
         , width <| px 80
         ]
-        (el [ centerX, Font.center, Font.color (Element.rgb255 30 30 30) ] (text "Projects")
+        (el
+            [ centerX
+            , Font.center
+            , Font.color <| rgb255 30 30 30
+            ]
+            (text "Projects")
             :: List.map
                 (\icon ->
                     newTabLink [ centerX ]
@@ -235,12 +241,12 @@ linksView model =
 
 wrapperView : Model -> Element Msg
 wrapperView model =
-    row
+    column
         [ height fill
         , width fill
         ]
-        [ textView
-        , linksView model
+        [ linksView model
+        , textView
         ]
 
 
