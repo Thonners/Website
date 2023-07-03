@@ -1,13 +1,14 @@
 module Main exposing (main)
 
+import Animator
 import Browser
+import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
-import Element.Border as Border
+import Element.Events
 import Element.Font as Font
-import Element.Input as Input
 import Html exposing (Html)
-import Html.Events exposing (onClick)
+import Time
 
 
 mtName : String
@@ -50,6 +51,11 @@ iconSize =
     50
 
 
+iconSizeHovered : Int
+iconSizeHovered =
+    55
+
+
 iconRoot : String
 iconRoot =
     "../assets/icons/"
@@ -59,30 +65,104 @@ type Status
     = InitialStatus
 
 
+type alias ButtonId =
+    String
+
+
 type alias Model =
     { status : Status
+    , linkButtonStates : Animator.Timeline (Dict ButtonId State)
     }
 
 
 type Msg
     = NoMsg
+    | RuntimeTriggeredAnimationStep Time.Posix
+    | UserHoveredButton ButtonId
+    | UserUnhoveredButton ButtonId
+
+
+type State
+    = Default
+    | Hover
+
+
+animator : Animator.Animator Model
+animator =
+    Animator.animator
+        |> Animator.watchingWith
+            -- we tell the animator how
+            -- to get the linkButtonStates timeline using .linkButtonStates
+            .linkButtonStates
+            -- and we tell the animator how
+            -- to update that timeline as well
+            (\newButtonStates model ->
+                { model | linkButtonStates = newButtonStates }
+            )
+            -- defines when the animation subscription should run. This is needed, in particular,
+            -- for continuous animation of so-called “resting states”, where there is no transition
+            -- happening between the underlying state of the model. In my case, I only want the
+            -- subscription to run when at least one button is in Hover state, which would allow me
+            -- to provide a continuous animation of the button under cursor.
+            (\buttonStates -> List.any ((==) Hover) <| Dict.values buttonStates)
 
 
 main : Program () Model Msg
 main =
     Browser.document
-        { init = \flags -> ( { status = InitialStatus }, Cmd.none )
+        { init =
+            \() ->
+                ( { status = InitialStatus
+                  , linkButtonStates =
+                        Animator.init <|
+                            Dict.fromList (List.map (\icon -> ( icon.filename, Default )) icons)
+                  }
+                , Cmd.none
+                )
         , view = \model -> { title = "Mathonwy Thomas", body = [ view model ] }
         , update = update
-        , subscriptions = \model -> Sub.none
+        , subscriptions =
+            \model ->
+                -- (4) - turning out Animator into a subscription
+                -- this is where the animator will decide to have a subscription to AnimationFrame or not.
+                animator
+                    |> Animator.toSubscription RuntimeTriggeredAnimationStep model
         }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        maybeAlways value =
+            Maybe.map (\_ -> value)
+
+        setButtonState id newState =
+            Dict.update id (maybeAlways newState) <| Animator.current model.linkButtonStates
+    in
     case msg of
         NoMsg ->
             ( model, Cmd.none )
+
+        RuntimeTriggeredAnimationStep newTime ->
+            ( model |> Animator.update newTime animator
+            , Cmd.none
+            )
+
+        UserHoveredButton id ->
+            ( { model
+                | linkButtonStates =
+                    Animator.go Animator.veryQuickly (setButtonState id Hover) model.linkButtonStates
+              }
+            , Cmd.none
+            )
+
+        UserUnhoveredButton id ->
+            ( { model
+                | linkButtonStates =
+                    Animator.go Animator.veryQuickly (setButtonState id Default) model.linkButtonStates
+              }
+            , Cmd.none
+            )
 
 
 scaled : Int -> Float
@@ -110,40 +190,57 @@ textView =
         [ nameView, subcaptionView ]
 
 
-linksView : Element msg
-linksView =
+linksView : Model -> Element Msg
+linksView model =
+    let
+        linkButtonSize id =
+            round <|
+                Animator.linear model.linkButtonStates <|
+                    \buttonStates ->
+                        Animator.at <|
+                            if (Maybe.withDefault Default <| Dict.get id buttonStates) == Hover then
+                                iconSizeHovered |> toFloat
+
+                            else
+                                iconSize |> toFloat
+    in
     column
         [ alignRight
-        , paddingXY 10 200
+        , paddingXY 15 200
         , spacing 10
         , alignTop
+        , width <| px 80
         ]
-        (List.map
-            (\icon ->
-                newTabLink []
-                    { url = icon.link
-                    , label =
-                        image
-                            [ width <| px iconSize
-                            , height <| px iconSize
-                            ]
-                            { src = fullIconPath icon.filename
-                            , description = ""
-                            }
-                    }
-            )
-            icons
+        (el [ centerX, Font.center, Font.color (Element.rgb255 30 30 30) ] (text "Projects")
+            :: List.map
+                (\icon ->
+                    newTabLink [ centerX ]
+                        { url = icon.link
+                        , label =
+                            image
+                                [ width <| px <| linkButtonSize icon.filename
+                                , height <| px <| linkButtonSize icon.filename
+                                , centerX
+                                , Element.Events.onMouseEnter (UserHoveredButton icon.filename)
+                                , Element.Events.onMouseLeave (UserUnhoveredButton icon.filename)
+                                ]
+                                { src = fullIconPath icon.filename
+                                , description = ""
+                                }
+                        }
+                )
+                icons
         )
 
 
-wrapperView : Element msg
-wrapperView =
+wrapperView : Model -> Element Msg
+wrapperView model =
     row
         [ height fill
         , width fill
         ]
         [ textView
-        , linksView
+        , linksView model
         ]
 
 
@@ -155,4 +252,4 @@ view model =
         , Background.image backgroundImagePath
         , Font.color <| rgb255 255 255 255
         ]
-        wrapperView
+        (wrapperView model)
