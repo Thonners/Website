@@ -1,261 +1,156 @@
 module Main exposing (main)
 
 import Animator
-import Browser
+import Browser exposing (Document, UrlRequest)
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Events
 import Element.Font as Font
+import Home
 import Html exposing (Html)
+import Route exposing (Route(..))
 import Time
-
-
-mtName : String
-mtName =
-    "MATHONWY THOMAS"
-
-
-mtCaption : String
-mtCaption =
-    "<Insert witty caption here>"
-
-
-backgroundImagePath : String
-backgroundImagePath =
-    "../assets/images/IMG_20161126_162719.jpg"
-
-
-type alias Icon =
-    { filename : String, link : String }
-
-
-icons : List Icon
-icons =
-    [ { filename = "crosswordtoolkit.webp"
-      , link = "https://play.google.com/store/apps/details?id=com.thonners.crosswordmaker"
-      }
-    , { filename = "github.svg"
-      , link = "https://github.com/Thonners"
-      }
-    ]
-
-
-fullIconPath : String -> String
-fullIconPath filename =
-    String.append iconRoot filename
-
-
-iconSize : Int
-iconSize =
-    50
-
-
-iconSizeHovered : Int
-iconSizeHovered =
-    55
-
-
-iconRoot : String
-iconRoot =
-    "../assets/icons/"
-
-
-type Status
-    = InitialStatus
-
-
-type alias ButtonId =
-    String
+import Tuesday
+import Url exposing (Url)
 
 
 type alias Model =
-    { status : Status
-    , linkButtonStates : Animator.Timeline (Dict ButtonId State)
+    { page : Page
+    , route : Route
+    , navKey : Nav.Key
     }
 
 
 type Msg
-    = NoMsg
-    | RuntimeTriggeredAnimationStep Time.Posix
-    | UserHoveredButton ButtonId
-    | UserUnhoveredButton ButtonId
+    = HomePageMsg Home.Msg
+    | LinkClicked UrlRequest
+    | UrlChanged Url
 
 
-type State
-    = Default
-    | Hover
+
+-- | TuesdayMsg Tuesday.Msg
 
 
-animator : Animator.Animator Model
-animator =
-    Animator.animator
-        -- Tutorial: https://korban.net/posts/elm/2020-04-07-using-elm-animator-with-elm-ui/
-        |> Animator.watchingWith
-            -- we tell the animator how
-            -- to get the linkButtonStates timeline using .linkButtonStates
-            .linkButtonStates
-            -- and we tell the animator how
-            -- to update that timeline as well
-            (\newButtonStates model ->
-                { model | linkButtonStates = newButtonStates }
-            )
-            -- defines when the animation subscription should run. This is needed, in particular,
-            -- for continuous animation of so-called “resting states”, where there is no transition
-            -- happening between the underlying state of the model. In my case, I only want the
-            -- subscription to run when at least one button is in Hover state, which would allow me
-            -- to provide a continuous animation of the button under cursor.
-            (\buttonStates -> List.any ((==) Hover) <| Dict.values buttonStates)
+type Page
+    = HomePage Home.Model
+      -- | TuesdayPage
+    | NotFoundPage
+
+
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url navKey =
+    let
+        model =
+            { page = NotFoundPage
+            , route = Route.parseUrl url
+            , navKey = navKey
+            }
+    in
+    initCurrentPage ( model, Cmd.none )
+
+
+initCurrentPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+initCurrentPage ( model, existingCmds ) =
+    let
+        ( currentPage, mappedPageCmds ) =
+            case model.route of
+                Route.NotFound ->
+                    ( NotFoundPage, Cmd.none )
+
+                Route.Home ->
+                    let
+                        ( pageModel, pageCmds ) =
+                            Home.init ()
+                    in
+                    ( HomePage pageModel, Cmd.map HomePageMsg pageCmds )
+
+                Route.Tuesday ->
+                    -- TODO: Change to Tuesday when it's ready
+                    ( NotFoundPage, Cmd.none )
+    in
+    ( { model | page = currentPage }
+    , Cmd.batch [ existingCmds, mappedPageCmds ]
+    )
+
+
+view : Model -> Document Msg
+view model =
+    let
+        title =
+            case model.page of
+                -- TuesdayPage ->
+                -- "TUESDAY"
+                _ ->
+                    "Mathonwy Thomas"
+    in
+    { title = title
+    , body =
+        [ case model.page of
+            NotFoundPage ->
+                notFoundView
+
+            HomePage pageModel ->
+                Home.view pageModel
+                    |> Html.map HomePageMsg
+        ]
+    }
+
+
+
+-- TuesdayPage pageModel ->
+--     ()
 
 
 main : Program () Model Msg
 main =
-    Browser.document
-        { init =
-            \() ->
-                ( { status = InitialStatus
-                  , linkButtonStates =
-                        Animator.init <|
-                            Dict.fromList (List.map (\icon -> ( icon.filename, Default )) icons)
-                  }
-                , Cmd.none
-                )
-        , view = \model -> { title = "Mathonwy Thomas", body = [ view model ] }
+    Browser.application
+        { init = init
+        , view = view
         , update = update
-        , subscriptions =
-            \model ->
-                -- (4) - turning out Animator into a subscription
-                -- this is where the animator will decide to have a subscription to AnimationFrame or not.
-                animator
-                    |> Animator.toSubscription RuntimeTriggeredAnimationStep model
+        , subscriptions = \_ -> Sub.none
+        , onUrlRequest = LinkClicked
+        , onUrlChange = UrlChanged
         }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        maybeAlways value =
-            Maybe.map (\_ -> value)
+    case ( msg, model.page ) of
+        ( HomePageMsg subMsg, HomePage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    Home.update subMsg pageModel
+            in
+            ( { model | page = HomePage updatedPageModel }
+            , Cmd.map HomePageMsg updatedCmd
+            )
 
-        setButtonState id newState =
-            Dict.update id (maybeAlways newState) <| Animator.current model.linkButtonStates
-    in
-    case msg of
-        NoMsg ->
+        ( LinkClicked urlRequest, _ ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model
+                    , Nav.pushUrl model.navKey (Url.toString url)
+                    )
+
+                Browser.External url ->
+                    ( model
+                    , Nav.load url
+                    )
+
+        ( UrlChanged url, _ ) ->
+            let
+                newRoute =
+                    Route.parseUrl url
+            in
+            ( { model | route = newRoute }, Cmd.none )
+                |> initCurrentPage
+
+        ( _, _ ) ->
             ( model, Cmd.none )
 
-        RuntimeTriggeredAnimationStep newTime ->
-            ( model |> Animator.update newTime animator
-            , Cmd.none
-            )
 
-        UserHoveredButton id ->
-            ( { model
-                | linkButtonStates =
-                    Animator.go Animator.veryQuickly (setButtonState id Hover) model.linkButtonStates
-              }
-            , Cmd.none
-            )
-
-        UserUnhoveredButton id ->
-            ( { model
-                | linkButtonStates =
-                    Animator.go Animator.veryQuickly (setButtonState id Default) model.linkButtonStates
-              }
-            , Cmd.none
-            )
-
-
-scaled : Int -> Float
-scaled =
-    Element.modular 18 1.25
-
-
-nameView : Element msg
-nameView =
-    el [ Font.size (round (scaled 5)), Font.bold ] (text mtName)
-
-
-subcaptionView : Element msg
-subcaptionView =
-    el [ Font.size (round (scaled 1)) ] (text mtCaption)
-
-
-textView : Element msg
-textView =
-    column
-        [ alignBottom
-        , paddingXY 500 50
-        , spacing 3
-        ]
-        [ nameView, subcaptionView ]
-
-
-linksView : Model -> Element Msg
-linksView model =
-    let
-        linkButtonSize id =
-            round <|
-                Animator.linear model.linkButtonStates <|
-                    \buttonStates ->
-                        Animator.at <|
-                            if (Maybe.withDefault Default <| Dict.get id buttonStates) == Hover then
-                                iconSizeHovered |> toFloat
-
-                            else
-                                iconSize |> toFloat
-    in
-    column
-        [ alignRight
-        , paddingXY 15 200
-        , spacing 10
-        , alignTop
-        , width <| px 80
-        ]
-        (el
-            [ centerX
-            , Font.center
-            , Font.color <| rgb255 30 30 30
-            ]
-            (text "Projects")
-            :: List.map
-                (\icon ->
-                    newTabLink [ centerX ]
-                        { url = icon.link
-                        , label =
-                            image
-                                [ width <| px <| linkButtonSize icon.filename
-                                , height <| px <| linkButtonSize icon.filename
-                                , centerX
-                                , Element.Events.onMouseEnter (UserHoveredButton icon.filename)
-                                , Element.Events.onMouseLeave (UserUnhoveredButton icon.filename)
-                                ]
-                                { src = fullIconPath icon.filename
-                                , description = ""
-                                }
-                        }
-                )
-                icons
-        )
-
-
-wrapperView : Model -> Element Msg
-wrapperView model =
-    column
-        [ height fill
-        , width fill
-        ]
-        [ linksView model
-        , textView
-        ]
-
-
-view : Model -> Html Msg
-view model =
-    layout
-        [ height fill
-        , width fill
-        , Background.image backgroundImagePath
-        , Font.color <| rgb255 255 255 255
-        ]
-        (wrapperView model)
+notFoundView : Html msg
+notFoundView =
+    Html.h3 [] [ Html.text "Oops! The page you requested was not found!" ]
