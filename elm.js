@@ -5226,6 +5226,12 @@ var $author$project$Main$HomePage = function (a) {
 var $author$project$Main$HomePageMsg = function (a) {
 	return {$: 'HomePageMsg', a: a};
 };
+var $author$project$Main$TuesdayMsg = function (a) {
+	return {$: 'TuesdayMsg', a: a};
+};
+var $author$project$Main$TuesdayPage = function (a) {
+	return {$: 'TuesdayPage', a: a};
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $author$project$Home$Default = {$: 'Default'};
 var $author$project$Home$InitialStatus = {$: 'InitialStatus'};
@@ -5356,7 +5362,7 @@ var $author$project$Home$icons = _List_fromArray(
 	[
 		{filename: 'crosswordtoolkit.webp', link: 'https://play.google.com/store/apps/details?id=com.thonners.crosswordmaker'},
 		{filename: 'github.svg', link: 'https://github.com/Thonners'},
-		{filename: 'T.svg', link: 'https://github.com/Thonners'}
+		{filename: 'T.svg', link: '/tuesday'}
 	]);
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
@@ -5407,6 +5413,11 @@ var $author$project$Home$init = function (_v0) {
 		},
 		$elm$core$Platform$Cmd$none);
 };
+var $author$project$Tuesday$init = function (_v0) {
+	return _Utils_Tuple2(
+		{},
+		$elm$core$Platform$Cmd$none);
+};
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $author$project$Main$initCurrentPage = function (_v0) {
 	var model = _v0.a;
@@ -5424,7 +5435,12 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 					$author$project$Main$HomePage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$HomePageMsg, pageCmds));
 			default:
-				return _Utils_Tuple2($author$project$Main$NotFoundPage, $elm$core$Platform$Cmd$none);
+				var _v4 = $author$project$Tuesday$init(_Utils_Tuple0);
+				var pageModel = _v4.a;
+				var pageCmds = _v4.b;
+				return _Utils_Tuple2(
+					$author$project$Main$TuesdayPage(pageModel),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$TuesdayMsg, pageCmds));
 		}
 	}();
 	var currentPage = _v1.a;
@@ -7684,50 +7700,56 @@ var $author$project$Home$update = F2(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(msg, model.page);
-		switch (_v0.a.$) {
-			case 'HomePageMsg':
-				if (_v0.b.$ === 'HomePage') {
-					var subMsg = _v0.a.a;
-					var pageModel = _v0.b.a;
-					var _v1 = A2($author$project$Home$update, subMsg, pageModel);
-					var updatedPageModel = _v1.a;
-					var updatedCmd = _v1.b;
-					return _Utils_Tuple2(
-						_Utils_update(
+		_v0$3:
+		while (true) {
+			switch (_v0.a.$) {
+				case 'HomePageMsg':
+					if (_v0.b.$ === 'HomePage') {
+						var subMsg = _v0.a.a;
+						var pageModel = _v0.b.a;
+						var _v1 = A2($author$project$Home$update, subMsg, pageModel);
+						var updatedPageModel = _v1.a;
+						var updatedCmd = _v1.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									page: $author$project$Main$HomePage(updatedPageModel)
+								}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$HomePageMsg, updatedCmd));
+					} else {
+						break _v0$3;
+					}
+				case 'LinkClicked':
+					var urlRequest = _v0.a.a;
+					if (urlRequest.$ === 'Internal') {
+						var url = urlRequest.a;
+						return _Utils_Tuple2(
 							model,
-							{
-								page: $author$project$Main$HomePage(updatedPageModel)
-							}),
-						A2($elm$core$Platform$Cmd$map, $author$project$Main$HomePageMsg, updatedCmd));
-				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				}
-			case 'LinkClicked':
-				var urlRequest = _v0.a.a;
-				if (urlRequest.$ === 'Internal') {
-					var url = urlRequest.a;
-					return _Utils_Tuple2(
-						model,
-						A2(
-							$elm$browser$Browser$Navigation$pushUrl,
-							model.navKey,
-							$elm$url$Url$toString(url)));
-				} else {
-					var url = urlRequest.a;
-					return _Utils_Tuple2(
-						model,
-						$elm$browser$Browser$Navigation$load(url));
-				}
-			default:
-				var url = _v0.a.a;
-				var newRoute = $author$project$Route$parseUrl(url);
-				return $author$project$Main$initCurrentPage(
-					_Utils_Tuple2(
-						_Utils_update(
+							A2(
+								$elm$browser$Browser$Navigation$pushUrl,
+								model.navKey,
+								$elm$url$Url$toString(url)));
+					} else {
+						var url = urlRequest.a;
+						return _Utils_Tuple2(
 							model,
-							{route: newRoute}),
-						$elm$core$Platform$Cmd$none));
+							$elm$browser$Browser$Navigation$load(url));
+					}
+				case 'UrlChanged':
+					var url = _v0.a.a;
+					var newRoute = $author$project$Route$parseUrl(url);
+					return $author$project$Main$initCurrentPage(
+						_Utils_Tuple2(
+							_Utils_update(
+								model,
+								{route: newRoute}),
+							$elm$core$Platform$Cmd$none));
+				default:
+					break _v0$3;
+			}
 		}
+		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
@@ -14569,24 +14591,123 @@ var $author$project$Home$view = function (model) {
 			]),
 		$author$project$Home$wrapperView(model));
 };
+var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
+var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
+var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
+var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
+var $mdgriffith$elm_ui$Element$row = F2(
+	function (attrs, children) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asRow,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+						attrs))),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
+	});
+var $author$project$Tuesday$tuesday = _List_fromArray(
+	[
+		_Utils_Tuple2(
+		'T',
+		A3($mdgriffith$elm_ui$Element$rgb255, 255, 0, 0)),
+		_Utils_Tuple2(
+		'U',
+		A3($mdgriffith$elm_ui$Element$rgb255, 220, 100, 23)),
+		_Utils_Tuple2(
+		'E',
+		A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 0)),
+		_Utils_Tuple2(
+		'S',
+		A3($mdgriffith$elm_ui$Element$rgb255, 0, 255, 0)),
+		_Utils_Tuple2(
+		'D',
+		A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 255)),
+		_Utils_Tuple2(
+		'A',
+		A3($mdgriffith$elm_ui$Element$rgb255, 75, 0, 130)),
+		_Utils_Tuple2(
+		'Y',
+		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255))
+	]);
+var $author$project$Tuesday$view = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$layout,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$Background$color(
+				A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 0)),
+				$mdgriffith$elm_ui$Element$Font$color(
+				A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 255))
+			]),
+		A2(
+			$mdgriffith$elm_ui$Element$row,
+			_List_fromArray(
+				[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
+			A2(
+				$elm$core$List$map,
+				function (_v0) {
+					var letter = _v0.a;
+					var color = _v0.b;
+					return A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$Font$color(color),
+								$mdgriffith$elm_ui$Element$Font$size(200)
+							]),
+						$mdgriffith$elm_ui$Element$text(letter));
+				},
+				$author$project$Tuesday$tuesday)));
+};
 var $author$project$Main$view = function (model) {
 	var title = function () {
 		var _v1 = model.page;
-		return 'Mathonwy Thomas';
+		if (_v1.$ === 'TuesdayPage') {
+			return 'TUESDAY';
+		} else {
+			return 'Mathonwy Thomas';
+		}
 	}();
 	return {
 		body: _List_fromArray(
 			[
 				function () {
 				var _v0 = model.page;
-				if (_v0.$ === 'NotFoundPage') {
-					return $author$project$Main$notFoundView;
-				} else {
-					var pageModel = _v0.a;
-					return A2(
-						$elm$html$Html$map,
-						$author$project$Main$HomePageMsg,
-						$author$project$Home$view(pageModel));
+				switch (_v0.$) {
+					case 'NotFoundPage':
+						return $author$project$Main$notFoundView;
+					case 'HomePage':
+						var pageModel = _v0.a;
+						return A2(
+							$elm$html$Html$map,
+							$author$project$Main$HomePageMsg,
+							$author$project$Home$view(pageModel));
+					default:
+						var pageModel = _v0.a;
+						return A2(
+							$elm$html$Html$map,
+							$author$project$Main$TuesdayMsg,
+							$author$project$Tuesday$view(pageModel));
 				}
 			}()
 			]),

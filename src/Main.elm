@@ -27,15 +27,12 @@ type Msg
     = HomePageMsg Home.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
-
-
-
--- | TuesdayMsg Tuesday.Msg
+    | TuesdayMsg Tuesday.Msg
 
 
 type Page
     = HomePage Home.Model
-      -- | TuesdayPage
+    | TuesdayPage Tuesday.Model
     | NotFoundPage
 
 
@@ -67,8 +64,11 @@ initCurrentPage ( model, existingCmds ) =
                     ( HomePage pageModel, Cmd.map HomePageMsg pageCmds )
 
                 Route.Tuesday ->
-                    -- TODO: Change to Tuesday when it's ready
-                    ( NotFoundPage, Cmd.none )
+                    let
+                        ( pageModel, pageCmds ) =
+                            Tuesday.init ()
+                    in
+                    ( TuesdayPage pageModel, Cmd.map TuesdayMsg pageCmds )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -80,8 +80,9 @@ view model =
     let
         title =
             case model.page of
-                -- TuesdayPage ->
-                -- "TUESDAY"
+                TuesdayPage _ ->
+                    "TUESDAY"
+
                 _ ->
                     "Mathonwy Thomas"
     in
@@ -94,13 +95,12 @@ view model =
             HomePage pageModel ->
                 Home.view pageModel
                     |> Html.map HomePageMsg
+
+            TuesdayPage pageModel ->
+                Tuesday.view pageModel
+                    |> Html.map TuesdayMsg
         ]
     }
-
-
-
--- TuesdayPage pageModel ->
---     ()
 
 
 main : Program () Model Msg

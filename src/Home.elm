@@ -39,7 +39,7 @@ icons =
       , link = "https://github.com/Thonners"
       }
     , { filename = "T.svg"
-      , link = "https://github.com/Thonners"
+      , link = "/tuesday"
       }
     ]
 
