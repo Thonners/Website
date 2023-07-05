@@ -1,6 +1,74 @@
-<svg width="100px" height="100px" viewBox="-12.8 -12.8 153.60 153.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--noto" preserveAspectRatio="xMidYMid meet" fill="#000000" data-darkreader-inline-fill="" style="--darkreader-inline-fill: #000000; --darkreader-inline-stroke: #e8e6e3;" stroke="#000000" data-darkreader-inline-stroke="" transform="matrix(1, 0, 0, 1, 0, 0)">
-    <g id="SVGRepo_iconCarrier">
-        <path d="M111.84 15.36H16.16c-1.24 0-2.24 1-2.24 2.24v17.99c0 1.24 1 2.24 2.24 2.24h34.65v80.73c0 1.24 1 2.24 2.24 2.24h21.9c1.24 0 2.24-1 2.24-2.24V37.83h34.65c1.24 0 2.24-1 2.24-2.24V17.6c0-1.24-1-2.24-2.24-2.24z" fill="#000000" data-darkreader-inline-fill="" style="--darkreader-inline-fill: #000000;">
-        </path>
-    </g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="100px"
+   height="100px"
+   viewBox="0 0 120 120"
+   aria-hidden="true"
+   role="img"
+   class="iconify iconify--noto"
+   preserveAspectRatio="xMidYMid meet"
+   fill="#000000"
+   stroke="#000000"
+   transform="matrix(1, 0, 0, 1, 0, 0)"
+   version="1.1"
+   id="svg96"
+   sodipodi:docname="T.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient964">
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0"
+         id="stop960" />
+      <stop
+         style="stop-color:#ff4900;stop-opacity:1;"
+         offset="0.2"
+         id="stop968" />
+      <stop
+         style="stop-color:#ebff00;stop-opacity:1;"
+         offset="0.36955991"
+         id="stop970" />
+      <stop
+         style="stop-color:#4aff00;stop-opacity:1;"
+         offset="0.49944508"
+         id="stop972" />
+      <stop
+         style="stop-color:#007cff;stop-opacity:1;"
+         offset="0.62869388"
+         id="stop974" />
+      <stop
+         style="stop-color:#6c00ff;stop-opacity:1;"
+         offset="0.80000001"
+         id="stop976" />
+      <stop
+         style="stop-color:#c000ff;stop-opacity:1;"
+         offset="1"
+         id="stop962" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient964"
+       id="linearGradient966"
+       x1="13.42"
+       y1="68.08"
+       x2="114.58"
+       y2="68.08"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="SVGRepo_iconCarrier"
+     transform="translate(-3.8057553,-7.655563)"
+     style="fill-opacity:1;fill:url(#linearGradient966)">
+    <path
+       d="M 111.84,15.36 H 16.16 c -1.24,0 -2.24,1 -2.24,2.24 v 17.99 c 0,1.24 1,2.24 2.24,2.24 h 34.65 v 80.73 c 0,1.24 1,2.24 2.24,2.24 h 21.9 c 1.24,0 2.24,-1 2.24,-2.24 V 37.83 h 34.65 c 1.24,0 2.24,-1 2.24,-2.24 V 17.6 c 0,-1.24 -1,-2.24 -2.24,-2.24 z"
+       id="path93" />
+  </g>
 </svg>
