@@ -2,6 +2,8 @@ module Main exposing (main)
 
 import Animator
 import Browser exposing (Document, UrlRequest)
+import Browser.Dom
+import Browser.Events
 import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import Element exposing (..)
@@ -20,14 +22,16 @@ type alias Model =
     { page : Page
     , route : Route
     , navKey : Nav.Key
+    , device : Device
     }
 
 
 type Msg
     = HomePageMsg Home.Msg
+    | TuesdayMsg Tuesday.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
-    | TuesdayMsg Tuesday.Msg
+    | GotNewScreenSize Int Int
 
 
 type Page
@@ -36,13 +40,18 @@ type Page
     | NotFoundPage
 
 
-init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+type alias ScreenSize =
+    { windowWidth : Int, windowHeight : Int }
+
+
+init : ScreenSize -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     let
         model =
             { page = NotFoundPage
             , route = Route.parseUrl url
             , navKey = navKey
+            , device = classifyDevice { height = flags.windowHeight, width = flags.windowWidth }
             }
     in
     initCurrentPage ( model, Cmd.none )
@@ -66,7 +75,7 @@ initCurrentPage ( model, existingCmds ) =
                 Route.Tuesday ->
                     let
                         ( pageModel, pageCmds ) =
-                            Tuesday.init ()
+                            Tuesday.init model.device
                     in
                     ( TuesdayPage pageModel, Cmd.map TuesdayMsg pageCmds )
     in
@@ -103,13 +112,18 @@ view model =
     }
 
 
-main : Program () Model Msg
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Browser.Events.onResize (\w h -> GotNewScreenSize w h)
+
+
+main : Program ScreenSize Model Msg
 main =
     Browser.application
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         , onUrlRequest = LinkClicked
         , onUrlChange = UrlChanged
         }
@@ -147,6 +161,7 @@ update msg model =
             ( { model | route = newRoute }, Cmd.none )
                 |> initCurrentPage
 
+        -- TODO: Deal with page resize
         ( _, _ ) ->
             ( model, Cmd.none )
 

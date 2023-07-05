@@ -11,15 +11,15 @@ import Html.Events exposing (onClick)
 import Time
 
 
-tuesday : List ( String, Color )
+tuesday : List ( String, String, Color )
 tuesday =
-    [ ( "T", rgb255 255 0 0 )
-    , ( "U", rgb255 220 100 23 )
-    , ( "E", rgb255 255 255 0 )
-    , ( "S", rgb255 0 255 0 )
-    , ( "D", rgb255 0 0 255 )
-    , ( "A", rgb255 75 0 130 )
-    , ( "Y", rgb255 127 0 255 )
+    [ ( "T", "rain", rgb255 255 0 0 )
+    , ( "U", "ntil", rgb255 220 100 23 )
+    , ( "E", "very", rgb255 255 255 0 )
+    , ( "S", "inue", rgb255 0 255 0 )
+    , ( "D", "evelops", rgb255 0 0 255 )
+    , ( "A", "nd", rgb255 75 0 130 )
+    , ( "Y", "ields", rgb255 127 0 255 )
     ]
 
 
@@ -39,34 +39,63 @@ type Msg
 
 
 type alias Model =
-    {}
+    { device : Device }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( {}
+init : Device -> ( Model, Cmd Msg )
+init device =
+    ( { device = device }
     , Cmd.none
     )
 
 
 view : Model -> Html Msg
 view model =
+    let
+        tuesdayLayout =
+            case model.device.orientation of
+                Portrait ->
+                    verticalTuesday
+
+                Landscape ->
+                    horizontalTuesday
+    in
     layout
         [ height fill
         , width fill
         , Background.color <| rgb255 0 0 0
         , Font.color <| rgb255 255 255 255
         ]
-        (row
-            [ centerY, centerX ]
-            (tuesday
-                |> List.map
-                    (\( letter, color ) ->
-                        el
-                            [ Font.color color
-                            , Font.size 200
-                            ]
-                            (text letter)
-                    )
-            )
+        tuesdayLayout
+
+
+horizontalTuesday : Element Msg
+horizontalTuesday =
+    row
+        [ centerY, centerX ]
+        (tuesday
+            |> List.map
+                (\( letter, _, color ) ->
+                    el
+                        [ Font.color color
+                        , Font.size 200
+                        ]
+                        (text letter)
+                )
+        )
+
+
+verticalTuesday : Element Msg
+verticalTuesday =
+    column
+        [ centerY, centerX ]
+        (tuesday
+            |> List.map
+                (\( letter, _, color ) ->
+                    el
+                        [ Font.color color
+                        , Font.size 200
+                        ]
+                        (text letter)
+                )
         )
