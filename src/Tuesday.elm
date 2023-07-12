@@ -38,15 +38,38 @@ type Msg
     | UserUnhoveredButton Id
 
 
+type alias ScreenSize =
+    { windowWidth : Int, windowHeight : Int }
+
+
 type alias Model =
-    { device : Device }
+    { device : Device
+    , screenSize : ScreenSize
+    }
 
 
-init : Device -> ( Model, Cmd Msg )
-init device =
-    ( { device = device }
+init : Device -> ScreenSize -> ( Model, Cmd Msg )
+init device screenSize =
+    ( { device = device
+      , screenSize = screenSize
+      }
     , Cmd.none
     )
+
+
+padding : Int
+padding =
+    50
+
+
+spacing : Int
+spacing =
+    1
+
+
+verticalFontSize : Model -> Int
+verticalFontSize model =
+    round <| toFloat (model.screenSize.windowHeight - 2 * padding - 6 * spacing) / 7
 
 
 view : Model -> Html Msg
@@ -55,7 +78,7 @@ view model =
         tuesdayLayout =
             case model.device.orientation of
                 Portrait ->
-                    verticalTuesday
+                    verticalTuesday model
 
                 Landscape ->
                     horizontalTuesday
@@ -85,16 +108,20 @@ horizontalTuesday =
         )
 
 
-verticalTuesday : Element Msg
-verticalTuesday =
+verticalTuesday : Model -> Element Msg
+verticalTuesday model =
     column
-        [ centerY, centerX ]
+        [ centerY
+        , centerX
+        , Element.spacing spacing
+        , Element.padding padding
+        ]
         (tuesday
             |> List.map
                 (\( letter, _, color ) ->
                     el
                         [ Font.color color
-                        , Font.size 200
+                        , Font.size <| verticalFontSize model
                         ]
                         (text letter)
                 )

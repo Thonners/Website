@@ -5435,11 +5435,12 @@ var $author$project$Home$init = function (_v0) {
 		},
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Tuesday$init = function (device) {
-	return _Utils_Tuple2(
-		{device: device},
-		$elm$core$Platform$Cmd$none);
-};
+var $author$project$Tuesday$init = F2(
+	function (device, screenSize) {
+		return _Utils_Tuple2(
+			{device: device, screenSize: screenSize},
+			$elm$core$Platform$Cmd$none);
+	});
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $author$project$Main$initCurrentPage = function (_v0) {
 	var model = _v0.a;
@@ -5457,7 +5458,7 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 					$author$project$Main$HomePage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$HomePageMsg, pageCmds));
 			default:
-				var _v4 = $author$project$Tuesday$init(model.device);
+				var _v4 = A2($author$project$Tuesday$init, model.device, model.screenSize);
 				var pageModel = _v4.a;
 				var pageCmds = _v4.b;
 				return _Utils_Tuple2(
@@ -6120,7 +6121,8 @@ var $author$project$Main$init = F3(
 				{height: flags.windowHeight, width: flags.windowWidth}),
 			navKey: navKey,
 			page: $author$project$Main$NotFoundPage,
-			route: $author$project$Route$parseUrl(url)
+			route: $author$project$Route$parseUrl(url),
+			screenSize: flags
 		};
 		return $author$project$Main$initCurrentPage(
 			_Utils_Tuple2(model, $elm$core$Platform$Cmd$none));
@@ -14976,30 +14978,56 @@ var $author$project$Tuesday$horizontalTuesday = A2(
 				$mdgriffith$elm_ui$Element$text(letter));
 		},
 		$author$project$Tuesday$tuesday));
-var $author$project$Tuesday$verticalTuesday = A2(
-	$mdgriffith$elm_ui$Element$column,
-	_List_fromArray(
-		[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
-	A2(
-		$elm$core$List$map,
-		function (_v0) {
-			var letter = _v0.a;
-			var color = _v0.c;
-			return A2(
-				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$Font$color(color),
-						$mdgriffith$elm_ui$Element$Font$size(200)
-					]),
-				$mdgriffith$elm_ui$Element$text(letter));
-		},
-		$author$project$Tuesday$tuesday));
+var $mdgriffith$elm_ui$Element$padding = function (x) {
+	var f = x;
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(x),
+			f,
+			f,
+			f,
+			f));
+};
+var $author$project$Tuesday$padding = 50;
+var $author$project$Tuesday$spacing = 1;
+var $author$project$Tuesday$verticalFontSize = function (model) {
+	return $elm$core$Basics$round(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
+};
+var $author$project$Tuesday$verticalTuesday = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$centerY,
+				$mdgriffith$elm_ui$Element$centerX,
+				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$spacing),
+				$mdgriffith$elm_ui$Element$padding($author$project$Tuesday$padding)
+			]),
+		A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var letter = _v0.a;
+				var color = _v0.c;
+				return A2(
+					$mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Font$color(color),
+							$mdgriffith$elm_ui$Element$Font$size(
+							$author$project$Tuesday$verticalFontSize(model))
+						]),
+					$mdgriffith$elm_ui$Element$text(letter));
+			},
+			$author$project$Tuesday$tuesday));
+};
 var $author$project$Tuesday$view = function (model) {
 	var tuesdayLayout = function () {
 		var _v0 = model.device.orientation;
 		if (_v0.$ === 'Portrait') {
-			return $author$project$Tuesday$verticalTuesday;
+			return $author$project$Tuesday$verticalTuesday(model);
 		} else {
 			return $author$project$Tuesday$horizontalTuesday;
 		}

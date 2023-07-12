@@ -14,7 +14,7 @@ import Home
 import Html exposing (Html)
 import Route exposing (Route(..))
 import Time
-import Tuesday
+import Tuesday exposing (ScreenSize)
 import Url exposing (Url)
 
 
@@ -23,6 +23,7 @@ type alias Model =
     , route : Route
     , navKey : Nav.Key
     , device : Device
+    , screenSize : ScreenSize
     }
 
 
@@ -40,10 +41,6 @@ type Page
     | NotFoundPage
 
 
-type alias ScreenSize =
-    { windowWidth : Int, windowHeight : Int }
-
-
 init : ScreenSize -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     let
@@ -52,6 +49,7 @@ init flags url navKey =
             , route = Route.parseUrl url
             , navKey = navKey
             , device = classifyDevice { height = flags.windowHeight, width = flags.windowWidth }
+            , screenSize = flags
             }
     in
     initCurrentPage ( model, Cmd.none )
@@ -75,7 +73,7 @@ initCurrentPage ( model, existingCmds ) =
                 Route.Tuesday ->
                     let
                         ( pageModel, pageCmds ) =
-                            Tuesday.init model.device
+                            Tuesday.init model.device model.screenSize
                     in
                     ( TuesdayPage pageModel, Cmd.map TuesdayMsg pageCmds )
     in
