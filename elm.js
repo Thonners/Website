@@ -5438,7 +5438,11 @@ var $author$project$Home$init = function (_v0) {
 var $author$project$Tuesday$init = F2(
 	function (device, screenSize) {
 		return _Utils_Tuple2(
-			{device: device, screenSize: screenSize},
+			{
+				animationState: $mdgriffith$elm_animator$Animator$init(false),
+				device: device,
+				screenSize: screenSize
+			},
 			$elm$core$Platform$Cmd$none);
 	});
 var $elm$core$Platform$Cmd$map = _Platform_map;
@@ -6132,6 +6136,9 @@ var $author$project$Main$GotNewScreenSize = F2(
 	function (a, b) {
 		return {$: 'GotNewScreenSize', a: a, b: b};
 	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$map = _Platform_map;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $elm$browser$Browser$Events$Window = {$: 'Window'};
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
@@ -6423,58 +6430,8 @@ var $elm$browser$Browser$Events$onResize = function (func) {
 				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
 				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
 };
-var $author$project$Main$subscriptions = function (model) {
-	return $elm$browser$Browser$Events$onResize(
-		F2(
-			function (w, h) {
-				return A2($author$project$Main$GotNewScreenSize, w, h);
-			}));
-};
-var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
-var $elm$url$Url$addPort = F2(
-	function (maybePort, starter) {
-		if (maybePort.$ === 'Nothing') {
-			return starter;
-		} else {
-			var port_ = maybePort.a;
-			return starter + (':' + $elm$core$String$fromInt(port_));
-		}
-	});
-var $elm$url$Url$addPrefixed = F3(
-	function (prefix, maybeSegment, starter) {
-		if (maybeSegment.$ === 'Nothing') {
-			return starter;
-		} else {
-			var segment = maybeSegment.a;
-			return _Utils_ap(
-				starter,
-				_Utils_ap(prefix, segment));
-		}
-	});
-var $elm$url$Url$toString = function (url) {
-	var http = function () {
-		var _v0 = url.protocol;
-		if (_v0.$ === 'Http') {
-			return 'http://';
-		} else {
-			return 'https://';
-		}
-	}();
-	return A3(
-		$elm$url$Url$addPrefixed,
-		'#',
-		url.fragment,
-		A3(
-			$elm$url$Url$addPrefixed,
-			'?',
-			url.query,
-			_Utils_ap(
-				A2(
-					$elm$url$Url$addPort,
-					url.port_,
-					_Utils_ap(http, url.host)),
-				url.path)));
+var $author$project$Home$RuntimeTriggeredAnimationStep = function (a) {
+	return {$: 'RuntimeTriggeredAnimationStep', a: a};
 };
 var $author$project$Home$Hover = {$: 'Hover'};
 var $mdgriffith$elm_animator$Internal$Timeline$Animator = F2(
@@ -7791,6 +7748,256 @@ var $author$project$Home$animator = A4(
 			$elm$core$Dict$values(buttonStates));
 	},
 	$mdgriffith$elm_animator$Animator$animator);
+var $elm$browser$Browser$AnimationManager$Time = function (a) {
+	return {$: 'Time', a: a};
+};
+var $elm$browser$Browser$AnimationManager$State = F3(
+	function (subs, request, oldTime) {
+		return {oldTime: oldTime, request: request, subs: subs};
+	});
+var $elm$browser$Browser$AnimationManager$init = $elm$core$Task$succeed(
+	A3($elm$browser$Browser$AnimationManager$State, _List_Nil, $elm$core$Maybe$Nothing, 0));
+var $elm$browser$Browser$AnimationManager$now = _Browser_now(_Utils_Tuple0);
+var $elm$browser$Browser$AnimationManager$rAF = _Browser_rAF(_Utils_Tuple0);
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$browser$Browser$AnimationManager$onEffects = F3(
+	function (router, subs, _v0) {
+		var request = _v0.request;
+		var oldTime = _v0.oldTime;
+		var _v1 = _Utils_Tuple2(request, subs);
+		if (_v1.a.$ === 'Nothing') {
+			if (!_v1.b.b) {
+				var _v2 = _v1.a;
+				return $elm$browser$Browser$AnimationManager$init;
+			} else {
+				var _v4 = _v1.a;
+				return A2(
+					$elm$core$Task$andThen,
+					function (pid) {
+						return A2(
+							$elm$core$Task$andThen,
+							function (time) {
+								return $elm$core$Task$succeed(
+									A3(
+										$elm$browser$Browser$AnimationManager$State,
+										subs,
+										$elm$core$Maybe$Just(pid),
+										time));
+							},
+							$elm$browser$Browser$AnimationManager$now);
+					},
+					$elm$core$Process$spawn(
+						A2(
+							$elm$core$Task$andThen,
+							$elm$core$Platform$sendToSelf(router),
+							$elm$browser$Browser$AnimationManager$rAF)));
+			}
+		} else {
+			if (!_v1.b.b) {
+				var pid = _v1.a.a;
+				return A2(
+					$elm$core$Task$andThen,
+					function (_v3) {
+						return $elm$browser$Browser$AnimationManager$init;
+					},
+					$elm$core$Process$kill(pid));
+			} else {
+				return $elm$core$Task$succeed(
+					A3($elm$browser$Browser$AnimationManager$State, subs, request, oldTime));
+			}
+		}
+	});
+var $elm$browser$Browser$AnimationManager$onSelfMsg = F3(
+	function (router, newTime, _v0) {
+		var subs = _v0.subs;
+		var oldTime = _v0.oldTime;
+		var send = function (sub) {
+			if (sub.$ === 'Time') {
+				var tagger = sub.a;
+				return A2(
+					$elm$core$Platform$sendToApp,
+					router,
+					tagger(
+						$elm$time$Time$millisToPosix(newTime)));
+			} else {
+				var tagger = sub.a;
+				return A2(
+					$elm$core$Platform$sendToApp,
+					router,
+					tagger(newTime - oldTime));
+			}
+		};
+		return A2(
+			$elm$core$Task$andThen,
+			function (pid) {
+				return A2(
+					$elm$core$Task$andThen,
+					function (_v1) {
+						return $elm$core$Task$succeed(
+							A3(
+								$elm$browser$Browser$AnimationManager$State,
+								subs,
+								$elm$core$Maybe$Just(pid),
+								newTime));
+					},
+					$elm$core$Task$sequence(
+						A2($elm$core$List$map, send, subs)));
+			},
+			$elm$core$Process$spawn(
+				A2(
+					$elm$core$Task$andThen,
+					$elm$core$Platform$sendToSelf(router),
+					$elm$browser$Browser$AnimationManager$rAF)));
+	});
+var $elm$browser$Browser$AnimationManager$Delta = function (a) {
+	return {$: 'Delta', a: a};
+};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$browser$Browser$AnimationManager$subMap = F2(
+	function (func, sub) {
+		if (sub.$ === 'Time') {
+			var tagger = sub.a;
+			return $elm$browser$Browser$AnimationManager$Time(
+				A2($elm$core$Basics$composeL, func, tagger));
+		} else {
+			var tagger = sub.a;
+			return $elm$browser$Browser$AnimationManager$Delta(
+				A2($elm$core$Basics$composeL, func, tagger));
+		}
+	});
+_Platform_effectManagers['Browser.AnimationManager'] = _Platform_createManager($elm$browser$Browser$AnimationManager$init, $elm$browser$Browser$AnimationManager$onEffects, $elm$browser$Browser$AnimationManager$onSelfMsg, 0, $elm$browser$Browser$AnimationManager$subMap);
+var $elm$browser$Browser$AnimationManager$subscription = _Platform_leaf('Browser.AnimationManager');
+var $elm$browser$Browser$AnimationManager$onAnimationFrame = function (tagger) {
+	return $elm$browser$Browser$AnimationManager$subscription(
+		$elm$browser$Browser$AnimationManager$Time(tagger));
+};
+var $elm$browser$Browser$Events$onAnimationFrame = $elm$browser$Browser$AnimationManager$onAnimationFrame;
+var $mdgriffith$elm_animator$Animator$toSubscription = F3(
+	function (toMsg, model, _v0) {
+		var isRunning = _v0.a;
+		return isRunning(model) ? $elm$browser$Browser$Events$onAnimationFrame(toMsg) : $elm$core$Platform$Sub$none;
+	});
+var $author$project$Home$subscriptions = function (model) {
+	return A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Home$RuntimeTriggeredAnimationStep, model, $author$project$Home$animator);
+};
+var $author$project$Tuesday$RuntimeTriggeredAnimationStep = function (a) {
+	return {$: 'RuntimeTriggeredAnimationStep', a: a};
+};
+var $mdgriffith$elm_animator$Animator$watching = F3(
+	function (get, set, _v0) {
+		var isRunning = _v0.a;
+		var updateModel = _v0.b;
+		return A2(
+			$mdgriffith$elm_animator$Internal$Timeline$Animator,
+			$elm$core$Basics$always(true),
+			F2(
+				function (now, model) {
+					var newModel = A2(updateModel, now, model);
+					return A2(
+						set,
+						A2(
+							$mdgriffith$elm_animator$Internal$Timeline$update,
+							now,
+							get(newModel)),
+						newModel);
+				}));
+	});
+var $author$project$Tuesday$animator = A3(
+	$mdgriffith$elm_animator$Animator$watching,
+	function ($) {
+		return $.animationState;
+	},
+	F2(
+		function (newAnimationState, model) {
+			return _Utils_update(
+				model,
+				{animationState: newAnimationState});
+		}),
+	$mdgriffith$elm_animator$Animator$animator);
+var $author$project$Tuesday$subscriptions = function (model) {
+	return A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Tuesday$RuntimeTriggeredAnimationStep, model, $author$project$Tuesday$animator);
+};
+var $author$project$Main$subscriptions = function (model) {
+	var pageSub = function () {
+		var _v0 = model.page;
+		switch (_v0.$) {
+			case 'TuesdayPage':
+				var m = _v0.a;
+				return A2(
+					$elm$core$Platform$Sub$map,
+					$author$project$Main$TuesdayMsg,
+					$author$project$Tuesday$subscriptions(m));
+			case 'HomePage':
+				var m = _v0.a;
+				return A2(
+					$elm$core$Platform$Sub$map,
+					$author$project$Main$HomePageMsg,
+					$author$project$Home$subscriptions(m));
+			default:
+				return $elm$core$Platform$Sub$none;
+		}
+	}();
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				$elm$browser$Browser$Events$onResize(
+				F2(
+					function (w, h) {
+						return A2($author$project$Main$GotNewScreenSize, w, h);
+					})),
+				pageSub
+			]));
+};
+var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $elm$url$Url$addPort = F2(
+	function (maybePort, starter) {
+		if (maybePort.$ === 'Nothing') {
+			return starter;
+		} else {
+			var port_ = maybePort.a;
+			return starter + (':' + $elm$core$String$fromInt(port_));
+		}
+	});
+var $elm$url$Url$addPrefixed = F3(
+	function (prefix, maybeSegment, starter) {
+		if (maybeSegment.$ === 'Nothing') {
+			return starter;
+		} else {
+			var segment = maybeSegment.a;
+			return _Utils_ap(
+				starter,
+				_Utils_ap(prefix, segment));
+		}
+	});
+var $elm$url$Url$toString = function (url) {
+	var http = function () {
+		var _v0 = url.protocol;
+		if (_v0.$ === 'Http') {
+			return 'http://';
+		} else {
+			return 'https://';
+		}
+	}();
+	return A3(
+		$elm$url$Url$addPrefixed,
+		'#',
+		url.fragment,
+		A3(
+			$elm$url$Url$addPrefixed,
+			'?',
+			url.query,
+			_Utils_ap(
+				A2(
+					$elm$url$Url$addPort,
+					url.port_,
+					_Utils_ap(http, url.host)),
+				url.path)));
+};
 var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
@@ -8020,10 +8227,30 @@ var $author$project$Home$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $elm$core$Debug$log = _Debug_log;
+var $mdgriffith$elm_animator$Animator$verySlowly = $mdgriffith$elm_animator$Animator$millis(500);
+var $author$project$Tuesday$update = F2(
+	function (msg, model) {
+		if (msg.$ === 'RuntimeTriggeredAnimationStep') {
+			var newTime = msg.a;
+			return _Utils_Tuple2(
+				A3($mdgriffith$elm_animator$Animator$update, newTime, $author$project$Tuesday$animator, model),
+				$elm$core$Platform$Cmd$none);
+		} else {
+			var _v1 = A2($elm$core$Debug$log, 'Hovered message sent, current status: ', model.animationState);
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						animationState: A3($mdgriffith$elm_animator$Animator$go, $mdgriffith$elm_animator$Animator$verySlowly, true, model.animationState)
+					}),
+				$elm$core$Platform$Cmd$none);
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(msg, model.page);
-		_v0$3:
+		_v0$4:
 		while (true) {
 			switch (_v0.a.$) {
 				case 'HomePageMsg':
@@ -8041,7 +8268,24 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$HomePageMsg, updatedCmd));
 					} else {
-						break _v0$3;
+						break _v0$4;
+					}
+				case 'TuesdayMsg':
+					if (_v0.b.$ === 'TuesdayPage') {
+						var subMsg = _v0.a.a;
+						var pageModel = _v0.b.a;
+						var _v2 = A2($author$project$Tuesday$update, subMsg, pageModel);
+						var updatedPageModel = _v2.a;
+						var updatedCmd = _v2.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									page: $author$project$Main$TuesdayPage(updatedPageModel)
+								}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$TuesdayMsg, updatedCmd));
+					} else {
+						break _v0$4;
 					}
 				case 'LinkClicked':
 					var urlRequest = _v0.a.a;
@@ -8069,7 +8313,7 @@ var $author$project$Main$update = F2(
 								{route: newRoute}),
 							$elm$core$Platform$Cmd$none));
 				default:
-					break _v0$3;
+					break _v0$4;
 			}
 		}
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -13908,11 +14152,6 @@ var $mdgriffith$elm_ui$Element$image = F2(
 						$mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
 					])));
 	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var $mdgriffith$elm_animator$Internal$Interpolate$dwellPeriod = function (movement) {
 	if (movement.$ === 'Pos') {
 		return $elm$core$Maybe$Nothing;
@@ -14906,28 +15145,70 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 			'background-color',
 			clr));
 };
+var $author$project$Tuesday$Hovered = {$: 'Hovered'};
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
-var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
-var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
-var $mdgriffith$elm_ui$Element$row = F2(
-	function (attrs, children) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asRow,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
-					A2(
-						$elm$core$List$cons,
-						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
-						attrs))),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
+var $mdgriffith$elm_animator$Internal$Interpolate$standardDefault = {arriveEarly: 0, arriveSlowly: 0.8, departLate: 0, departSlowly: 0.4, wobbliness: 0};
+var $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault = function (defMovement) {
+	if (defMovement.$ === 'Oscillate') {
+		var specifiedPersonality = defMovement.a;
+		var period = defMovement.b;
+		var fn = defMovement.c;
+		var personality = A2($mdgriffith$elm_animator$Internal$Interpolate$fillDefaults, $mdgriffith$elm_animator$Internal$Interpolate$standardDefault, specifiedPersonality);
+		return A3($mdgriffith$elm_animator$Internal$Interpolate$Osc, personality, period, fn);
+	} else {
+		var specifiedPersonality = defMovement.a;
+		var p = defMovement.b;
+		var personality = A2($mdgriffith$elm_animator$Internal$Interpolate$fillDefaults, $mdgriffith$elm_animator$Internal$Interpolate$standardDefault, specifiedPersonality);
+		return A2($mdgriffith$elm_animator$Internal$Interpolate$Pos, personality, p);
+	}
+};
+var $mdgriffith$elm_animator$Animator$move = F2(
+	function (timeline, lookup) {
+		return A2(
+			$mdgriffith$elm_animator$Internal$Interpolate$details,
+			timeline,
+			A2($elm$core$Basics$composeL, $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault, lookup)).position;
 	});
+var $mdgriffith$elm_ui$Internal$Model$MoveX = function (a) {
+	return {$: 'MoveX', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$TransformComponent = F2(
+	function (a, b) {
+		return {$: 'TransformComponent', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$moveX = $mdgriffith$elm_ui$Internal$Flag$flag(25);
+var $mdgriffith$elm_ui$Element$moveRight = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
+		$mdgriffith$elm_ui$Internal$Flag$moveX,
+		$mdgriffith$elm_ui$Internal$Model$MoveX(x));
+};
+var $mdgriffith$elm_ui$Internal$Model$MoveY = function (a) {
+	return {$: 'MoveY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Flag$moveY = $mdgriffith$elm_ui$Internal$Flag$flag(26);
+var $mdgriffith$elm_ui$Element$moveUp = function (y) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
+		$mdgriffith$elm_ui$Internal$Flag$moveY,
+		$mdgriffith$elm_ui$Internal$Model$MoveY(-y));
+};
+var $mdgriffith$elm_ui$Element$padding = function (x) {
+	var f = x;
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(x),
+			f,
+			f,
+			f,
+			f));
+};
+var $author$project$Tuesday$padding = 50;
+var $author$project$Tuesday$spacing = 1;
 var $author$project$Tuesday$tuesday = _List_fromArray(
 	[
 		_Utils_Tuple3(
@@ -14959,42 +15240,53 @@ var $author$project$Tuesday$tuesday = _List_fromArray(
 		'ields',
 		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255))
 	]);
-var $author$project$Tuesday$horizontalTuesday = A2(
-	$mdgriffith$elm_ui$Element$row,
-	_List_fromArray(
-		[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
-	A2(
-		$elm$core$List$map,
-		function (_v0) {
-			var letter = _v0.a;
-			var color = _v0.c;
-			return A2(
-				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$Font$color(color),
-						$mdgriffith$elm_ui$Element$Font$size(200)
-					]),
-				$mdgriffith$elm_ui$Element$text(letter));
-		},
-		$author$project$Tuesday$tuesday));
-var $mdgriffith$elm_ui$Element$padding = function (x) {
-	var f = x;
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + $elm$core$String$fromInt(x),
-			f,
-			f,
-			f,
-			f));
-};
-var $author$project$Tuesday$padding = 50;
-var $author$project$Tuesday$spacing = 1;
 var $author$project$Tuesday$verticalFontSize = function (model) {
 	return $elm$core$Basics$round(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
+};
+var $author$project$Tuesday$horizontalTuesday = function (model) {
+	var windowWidthWithoutPadding = model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
+	var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
+	var horizontalFontSize = 0.66 * $author$project$Tuesday$verticalFontSize(model);
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$centerY,
+				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$spacing),
+				$mdgriffith$elm_ui$Element$padding($author$project$Tuesday$padding)
+			]),
+		A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (i, _v0) {
+					var letter = _v0.a;
+					var color = _v0.c;
+					return A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$Font$color(color),
+								$mdgriffith$elm_ui$Element$Font$size(
+								$author$project$Tuesday$verticalFontSize(model)),
+								$mdgriffith$elm_ui$Element$Events$onMouseEnter($author$project$Tuesday$Hovered),
+								$mdgriffith$elm_ui$Element$moveRight(
+								A2(
+									$mdgriffith$elm_animator$Animator$move,
+									model.animationState,
+									function (animationHasStarted) {
+										return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(((windowWidthWithoutPadding - horizontalFontSize) / 7) * (i + 0.5));
+									})),
+								$mdgriffith$elm_ui$Element$moveUp(
+								A2(
+									$mdgriffith$elm_animator$Animator$move,
+									model.animationState,
+									function (animationHasStarted) {
+										return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(((windowHeightWithoutPadding / 7) * (i + 1)) - (windowHeightWithoutPadding / 2));
+									}))
+							]),
+						$mdgriffith$elm_ui$Element$text(letter));
+				}),
+			$author$project$Tuesday$tuesday));
 };
 var $author$project$Tuesday$verticalTuesday = function (model) {
 	return A2(
@@ -15002,7 +15294,6 @@ var $author$project$Tuesday$verticalTuesday = function (model) {
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$centerY,
-				$mdgriffith$elm_ui$Element$centerX,
 				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$spacing),
 				$mdgriffith$elm_ui$Element$padding($author$project$Tuesday$padding)
 			]),
@@ -15017,7 +15308,16 @@ var $author$project$Tuesday$verticalTuesday = function (model) {
 						[
 							$mdgriffith$elm_ui$Element$Font$color(color),
 							$mdgriffith$elm_ui$Element$Font$size(
-							$author$project$Tuesday$verticalFontSize(model))
+							$author$project$Tuesday$verticalFontSize(model)),
+							$mdgriffith$elm_ui$Element$centerX,
+							$mdgriffith$elm_ui$Element$Events$onMouseEnter($author$project$Tuesday$Hovered),
+							$mdgriffith$elm_ui$Element$moveRight(
+							A2(
+								$mdgriffith$elm_animator$Animator$move,
+								model.animationState,
+								function (animationHasStarted) {
+									return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at((model.screenSize.windowWidth / 2) - 100);
+								}))
 						]),
 					$mdgriffith$elm_ui$Element$text(letter));
 			},
@@ -15029,7 +15329,7 @@ var $author$project$Tuesday$view = function (model) {
 		if (_v0.$ === 'Portrait') {
 			return $author$project$Tuesday$verticalTuesday(model);
 		} else {
-			return $author$project$Tuesday$horizontalTuesday;
+			return $author$project$Tuesday$horizontalTuesday(model);
 		}
 	}();
 	return A2(

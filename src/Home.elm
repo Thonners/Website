@@ -128,13 +128,16 @@ main =
         { init = init
         , view = \model -> { title = "Mathonwy Thomas", body = [ view model ] }
         , update = update
-        , subscriptions =
-            \model ->
-                -- (4) - turning out Animator into a subscription
-                -- this is where the animator will decide to have a subscription to AnimationFrame or not.
-                animator
-                    |> Animator.toSubscription RuntimeTriggeredAnimationStep model
+        , subscriptions = subscriptions
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    -- (4) - turning out Animator into a subscription
+    -- this is where the animator will decide to have a subscription to AnimationFrame or not.
+    animator
+        |> Animator.toSubscription RuntimeTriggeredAnimationStep model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
