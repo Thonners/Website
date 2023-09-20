@@ -142,8 +142,14 @@ horizontalTuesday model =
         horizontalFontSize =
             0.66 * toFloat (verticalFontSize model)
 
+        horizontalFontSizePlusPadding =
+            horizontalFontSize + toFloat padding
+
         windowWidthWithoutPadding =
             toFloat (model.screenSize.windowWidth - 2 * padding)
+
+        leftHandOffset =
+            windowWidthWithoutPadding / 2 - (3.5 * horizontalFontSizePlusPadding)
 
         windowHeightWithoutPadding =
             toFloat (model.screenSize.windowHeight - 2 * padding)
@@ -167,7 +173,7 @@ horizontalTuesday model =
                                         Animator.at 0
 
                                     else
-                                        Animator.at <| (((windowWidthWithoutPadding - horizontalFontSize) / 7) * (toFloat i + 0.5))
+                                        Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat i)
                                 )
                             )
                         , moveUp

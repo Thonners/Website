@@ -15247,6 +15247,8 @@ var $author$project$Tuesday$horizontalTuesday = function (model) {
 	var windowWidthWithoutPadding = model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
 	var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
 	var horizontalFontSize = 0.66 * $author$project$Tuesday$verticalFontSize(model);
+	var horizontalFontSizePlusPadding = horizontalFontSize + $author$project$Tuesday$padding;
+	var leftHandOffset = (windowWidthWithoutPadding / 2) - (3.5 * horizontalFontSizePlusPadding);
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
 		_List_fromArray(
@@ -15274,7 +15276,7 @@ var $author$project$Tuesday$horizontalTuesday = function (model) {
 									$mdgriffith$elm_animator$Animator$move,
 									model.animationState,
 									function (animationHasStarted) {
-										return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(((windowWidthWithoutPadding - horizontalFontSize) / 7) * (i + 0.5));
+										return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(leftHandOffset + (horizontalFontSizePlusPadding * i));
 									})),
 								$mdgriffith$elm_ui$Element$moveUp(
 								A2(
