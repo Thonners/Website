@@ -14,22 +14,32 @@ import Html exposing (Html)
 import Time
 
 
-tuesday : List ( String, String, Color )
+type alias LetterDetails =
+    { letter : String
+    , restOfWord : String
+    , colour : Color
+    , targetLetterFadeInState : AnimationState
+    , targetWordFadeInState : AnimationState
+    }
+
+
+tuesday : List LetterDetails
 tuesday =
-    [ ( "T", "rain", rgb255 255 0 0 )
-    , ( "U", "ntil", rgb255 220 100 23 )
-    , ( "E", "very", rgb255 255 255 0 )
-    , ( "S", "inue", rgb255 0 255 0 )
-    , ( "D", "evelops", rgb255 0 0 255 )
-    , ( "A", "nd", rgb255 75 0 130 )
-    , ( "Y", "ields", rgb255 127 0 255 )
+    [ LetterDetails "T" "rain" (rgb255 255 0 0) (FadeInLetter 1) (FadeInWord 1)
+    , LetterDetails "U" "ntil" (rgb255 220 100 23) (FadeInLetter 2) (FadeInWord 2)
+    , LetterDetails "E" "very" (rgb255 255 255 0) (FadeInLetter 3) (FadeInWord 3)
+    , LetterDetails "S" "inue" (rgb255 0 255 0) (FadeInLetter 4) (FadeInWord 4)
+    , LetterDetails "D" "evelops" (rgb255 0 0 255) (FadeInLetter 5) (FadeInWord 5)
+    , LetterDetails "A" "nd" (rgb255 75 0 130) (FadeInLetter 6) (FadeInWord 6)
+    , LetterDetails "Y" "ields" (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 7)
     ]
 
 
 type AnimationState
     = NotStarted
-    | InitialWait
+    | FadeInLetter Int
     | SlideLeft
+    | FadeInWord Int
     | WordsDisplayed
 
 
@@ -52,11 +62,43 @@ type alias Model =
     }
 
 
+fadeInDelayLetter : Float
+fadeInDelayLetter =
+    0.5
+
+
+fadeInDelayWord : Float
+fadeInDelayWord =
+    0.7
+
+
 init : Device -> ScreenSize -> ( Model, Cmd Msg )
 init device screenSize =
+    let
+        fadeInQueue =
+            Animator.queue
+                [ Animator.wait (Animator.seconds 1)
+                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 1)
+                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 2)
+                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 3)
+                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 4)
+                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
+                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
+                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
+                , Animator.event (Animator.seconds 1.5) SlideLeft
+                , Animator.wait (Animator.seconds 0.2)
+                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 1)
+                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 2)
+                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 3)
+                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 4)
+                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 5)
+                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 6)
+                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 7)
+                ]
+    in
     ( { device = device
       , screenSize = screenSize
-      , animationState = Animator.go (Animator.seconds 2) InitialWait <| Animator.init NotStarted
+      , animationState = fadeInQueue <| Animator.init NotStarted
       }
     , Cmd.none
     )
@@ -104,35 +146,9 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RuntimeTriggeredAnimationStep newTime ->
-            if Animator.arrivedAt InitialWait newTime model.animationState then
-                let
-                    _ =
-                        Debug.log "Starting the animation..."
-                in
-                ( updateAnimationState model SlideLeft newTime, Cmd.none )
-
-            else if Animator.arrivedAt SlideLeft newTime model.animationState && Animator.current model.animationState == SlideLeft then
-                let
-                    _ =
-                        Debug.log "Arrived at SlideLeftComplete: " model.animationState
-                in
-                ( updateAnimationState model WordsDisplayed newTime, Cmd.none )
-
-            else if Animator.arrivedAt WordsDisplayed newTime model.animationState then
-                let
-                    _ =
-                        Debug.log "Arrived at words displayed: " model.animationState
-                in
-                ( model |> Animator.update newTime animator, Cmd.none )
-
-            else
-                let
-                    _ =
-                        Debug.log "Tick"
-                in
-                ( model |> Animator.update newTime animator
-                , Cmd.none
-                )
+            ( model |> Animator.update newTime animator
+            , Cmd.none
+            )
 
 
 verticalFontSize : Model -> Int
@@ -192,10 +208,10 @@ verticalTuesday model =
         )
 
 
-letterElement : Model -> Int -> ( String, String, Color ) -> Element Msg
-letterElement model letterIndex ( letter, restOfWord, color ) =
+letterElement : Model -> Int -> LetterDetails -> Element Msg
+letterElement model letterIndex { letter, restOfWord, colour, targetLetterFadeInState, targetWordFadeInState } =
     el
-        [ Font.color color
+        [ Font.color colour
         , Font.size <| verticalFontSize model
         , tuesdayFont
 
@@ -204,8 +220,8 @@ letterElement model letterIndex ( letter, restOfWord, color ) =
         , moveUp <| upMoveAmount model letterIndex
         ]
         (row []
-            [ el [ letterFadeInAnimation model ] <| text letter
-            , el [ wordFadeInAnimation model ] <| text restOfWord
+            [ el [ letterFadeInAnimation model targetLetterFadeInState ] <| text letter
+            , el [ wordFadeInAnimation model targetWordFadeInState ] <| text restOfWord
             ]
         )
 
@@ -215,6 +231,9 @@ upMoveAmount model letterIndex =
     let
         windowHeightWithoutPadding =
             toFloat (model.screenSize.windowHeight - 2 * padding)
+
+        preMovement =
+            Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -222,11 +241,15 @@ upMoveAmount model letterIndex =
     else
         Animator.move model.animationState
             (\animationState ->
-                if animationState == NotStarted || animationState == InitialWait then
-                    Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
+                case animationState of
+                    NotStarted ->
+                        preMovement
 
-                else
-                    Animator.at <| 0
+                    FadeInLetter _ ->
+                        preMovement
+
+                    _ ->
+                        Animator.at <| 0
             )
 
 
@@ -244,6 +267,9 @@ rightMoveAmount model letterIndex =
 
         leftHandOffset =
             windowWidthWithoutPadding / 2 - (3.5 * horizontalFontSizePlusPadding)
+
+        preMovement =
+            Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -251,38 +277,78 @@ rightMoveAmount model letterIndex =
     else
         Animator.move model.animationState
             (\animationState ->
-                if animationState == NotStarted || animationState == InitialWait then
-                    Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
+                case animationState of
+                    NotStarted ->
+                        preMovement
+
+                    FadeInLetter _ ->
+                        preMovement
+
+                    _ ->
+                        Animator.at <| 0
+            )
+
+
+letterFadeInAnimation : Model -> AnimationState -> Attribute Msg
+letterFadeInAnimation model targetAnimationState =
+    let
+        animationComplete =
+            case Animator.current model.animationState of
+                FadeInLetter currentI ->
+                    case targetAnimationState of
+                        FadeInLetter targetI ->
+                            currentI > targetI
+
+                        _ ->
+                            False
+
+                NotStarted ->
+                    False
+
+                _ ->
+                    True
+    in
+    htmlAttribute <|
+        Animator.Inline.opacity model.animationState
+            (\state ->
+                if state == targetAnimationState || animationComplete then
+                    Animator.at 1
 
                 else
                     Animator.at 0
             )
 
 
-letterFadeInAnimation : Model -> Attribute Msg
-letterFadeInAnimation model =
+wordFadeInAnimation : Model -> AnimationState -> Attribute Msg
+wordFadeInAnimation model targetAnimationState =
     let
-        targetAnimation =
-            Animator.Inline.opacity model.animationState
-                (\state ->
-                    if state == NotStarted then
-                        Animator.at 0
+        animationComplete =
+            case Animator.current model.animationState of
+                FadeInWord currentI ->
+                    case targetAnimationState of
+                        FadeInWord targetI ->
+                            currentI > targetI
 
-                    else
-                        Animator.at 1
-                )
+                        _ ->
+                            False
+
+                NotStarted ->
+                    False
+
+                FadeInLetter _ ->
+                    False
+
+                SlideLeft ->
+                    False
+
+                WordsDisplayed ->
+                    True
     in
-    htmlAttribute <|
-        targetAnimation
-
-
-wordFadeInAnimation : Model -> Attribute Msg
-wordFadeInAnimation model =
     htmlAttribute <|
         Animator.Inline.opacity model.animationState
             (\state ->
-                if state == WordsDisplayed then
-                    Animator.at 1
+                if state == targetAnimationState || animationComplete then
+                    Animator.at 1 |> Animator.leaveSmoothly 0.8
 
                 else
                     Animator.at 0
