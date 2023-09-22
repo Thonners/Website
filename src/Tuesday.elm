@@ -29,13 +29,8 @@ tuesday =
 type AnimationState
     = NotStarted
     | InitialWait
-    | SlideLeftComplete
+    | SlideLeft
     | WordsDisplayed
-
-
-type State
-    = Default
-    | Hover
 
 
 type alias Id =
@@ -44,7 +39,6 @@ type alias Id =
 
 type Msg
     = RuntimeTriggeredAnimationStep Time.Posix
-    | Hovered
 
 
 type alias ScreenSize =
@@ -115,9 +109,9 @@ update msg model =
                     _ =
                         Debug.log "Starting the animation..."
                 in
-                ( updateAnimationState model SlideLeftComplete newTime, Cmd.none )
+                ( updateAnimationState model SlideLeft newTime, Cmd.none )
 
-            else if Animator.arrivedAt SlideLeftComplete newTime model.animationState && Animator.current model.animationState == SlideLeftComplete then
+            else if Animator.arrivedAt SlideLeft newTime model.animationState && Animator.current model.animationState == SlideLeft then
                 let
                     _ =
                         Debug.log "Arrived at SlideLeftComplete: " model.animationState
@@ -139,15 +133,6 @@ update msg model =
                 ( model |> Animator.update newTime animator
                 , Cmd.none
                 )
-
-        Hovered ->
-            let
-                _ =
-                    Debug.log "Hovered message sent, current status: " model.animationState
-            in
-            ( { model | animationState = Animator.go Animator.verySlowly SlideLeftComplete model.animationState }
-            , Cmd.none
-            )
 
 
 verticalFontSize : Model -> Int
@@ -209,6 +194,44 @@ verticalTuesday model =
 
 letterElement : Model -> Int -> ( String, String, Color ) -> Element Msg
 letterElement model letterIndex ( letter, restOfWord, color ) =
+    el
+        [ Font.color color
+        , Font.size <| verticalFontSize model
+        , tuesdayFont
+
+        -- , Element.Events.onMouseEnter Hovered
+        , moveRight <| rightMoveAmount model letterIndex
+        , moveUp <| upMoveAmount model letterIndex
+        ]
+        (row []
+            [ el [ letterFadeInAnimation model ] <| text letter
+            , el [ wordFadeInAnimation model ] <| text restOfWord
+            ]
+        )
+
+
+upMoveAmount : Model -> Int -> Float
+upMoveAmount model letterIndex =
+    let
+        windowHeightWithoutPadding =
+            toFloat (model.screenSize.windowHeight - 2 * padding)
+    in
+    if Animator.current model.animationState == WordsDisplayed then
+        0
+
+    else
+        Animator.move model.animationState
+            (\animationState ->
+                if animationState == NotStarted || animationState == InitialWait then
+                    Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
+
+                else
+                    Animator.at <| 0
+            )
+
+
+rightMoveAmount : Model -> Int -> Float
+rightMoveAmount model letterIndex =
     let
         horizontalFontSize =
             0.66 * toFloat (verticalFontSize model)
@@ -221,63 +244,36 @@ letterElement model letterIndex ( letter, restOfWord, color ) =
 
         leftHandOffset =
             windowWidthWithoutPadding / 2 - (3.5 * horizontalFontSizePlusPadding)
-
-        windowHeightWithoutPadding =
-            toFloat (model.screenSize.windowHeight - 2 * padding)
     in
-    el
-        [ Font.color color
-        , Font.size <| verticalFontSize model
-        , tuesdayFont
-        , Element.Events.onMouseEnter Hovered
-        , moveRight
-            (if Animator.current model.animationState == WordsDisplayed then
-                0
+    if Animator.current model.animationState == WordsDisplayed then
+        0
 
-             else
-                Animator.move model.animationState
-                    (\animationState ->
-                        if animationState == NotStarted || animationState == InitialWait then
-                            Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
-
-                        else
-                            Animator.at 0
-                    )
-            )
-        , moveUp
-            (if Animator.current model.animationState == WordsDisplayed then
-                0
-
-             else
-                Animator.move model.animationState
-                    (\animationState ->
-                        if animationState == NotStarted || animationState == InitialWait then
-                            Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
-
-                        else
-                            Animator.at <| 0
-                    )
-            )
-        ]
-        (row []
-            [ el [ letterFadeInAnimation model letterIndex ] <| text letter
-            , el [ wordFadeInAnimation model ] <| text restOfWord
-            ]
-        )
-
-
-letterFadeInAnimation : Model -> Int -> Attribute Msg
-letterFadeInAnimation model letterIndex =
-    htmlAttribute <|
-        Animator.Inline.opacity model.animationState
-            (\state ->
-                if state == NotStarted then
-                    Animator.at 0
+    else
+        Animator.move model.animationState
+            (\animationState ->
+                if animationState == NotStarted || animationState == InitialWait then
+                    Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
 
                 else
-                    Animator.at 1
-                        |> Animator.leaveLate (0.3 + 0.1 * toFloat letterIndex)
+                    Animator.at 0
             )
+
+
+letterFadeInAnimation : Model -> Attribute Msg
+letterFadeInAnimation model =
+    let
+        targetAnimation =
+            Animator.Inline.opacity model.animationState
+                (\state ->
+                    if state == NotStarted then
+                        Animator.at 0
+
+                    else
+                        Animator.at 1
+                )
+    in
+    htmlAttribute <|
+        targetAnimation
 
 
 wordFadeInAnimation : Model -> Attribute Msg
