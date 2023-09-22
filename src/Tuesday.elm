@@ -146,58 +146,13 @@ tuesdayFont =
 
 horizontalTuesday : Model -> Element Msg
 horizontalTuesday model =
-    let
-        horizontalFontSize =
-            0.66 * toFloat (verticalFontSize model)
-
-        horizontalFontSizePlusPadding =
-            horizontalFontSize + toFloat padding
-
-        windowWidthWithoutPadding =
-            toFloat (model.screenSize.windowWidth - 2 * padding)
-
-        leftHandOffset =
-            windowWidthWithoutPadding / 2 - (3.5 * horizontalFontSizePlusPadding)
-
-        windowHeightWithoutPadding =
-            toFloat (model.screenSize.windowHeight - 2 * padding)
-    in
     column
         [ centerY
         , Element.spacing spacing
         , Element.padding padding
         ]
         (tuesday
-            |> List.indexedMap
-                (\i ( letter, _, color ) ->
-                    el
-                        [ Font.color color
-                        , Font.size <| verticalFontSize model
-                        , tuesdayFont
-                        , Element.Events.onMouseEnter Hovered
-                        , moveRight
-                            (Animator.move model.animationState
-                                (\animationHasStarted ->
-                                    if animationHasStarted then
-                                        Animator.at 0
-
-                                    else
-                                        Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat i)
-                                )
-                            )
-                        , moveUp
-                            (Animator.move model.animationState
-                                (\animationHasStarted ->
-                                    if animationHasStarted then
-                                        Animator.at <| 0
-
-                                    else
-                                        Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat i + 1)) - (windowHeightWithoutPadding / 2)
-                                )
-                            )
-                        ]
-                        (text letter)
-                )
+            |> List.indexedMap (letterElement model)
         )
 
 
@@ -231,3 +186,50 @@ verticalTuesday model =
                         (text letter)
                 )
         )
+
+
+letterElement : Model -> Int -> ( String, String, Color ) -> Element Msg
+letterElement model letterIndex ( letter, restOfWord, color ) =
+    let
+        horizontalFontSize =
+            0.66 * toFloat (verticalFontSize model)
+
+        horizontalFontSizePlusPadding =
+            horizontalFontSize + toFloat padding
+
+        windowWidthWithoutPadding =
+            toFloat (model.screenSize.windowWidth - 2 * padding)
+
+        leftHandOffset =
+            windowWidthWithoutPadding / 2 - (3.5 * horizontalFontSizePlusPadding)
+
+        windowHeightWithoutPadding =
+            toFloat (model.screenSize.windowHeight - 2 * padding)
+    in
+    el
+        [ Font.color color
+        , Font.size <| verticalFontSize model
+        , tuesdayFont
+        , Element.Events.onMouseEnter Hovered
+        , moveRight
+            (Animator.move model.animationState
+                (\animationHasStarted ->
+                    if animationHasStarted then
+                        Animator.at 0
+
+                    else
+                        Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
+                )
+            )
+        , moveUp
+            (Animator.move model.animationState
+                (\animationHasStarted ->
+                    if animationHasStarted then
+                        Animator.at <| 0
+
+                    else
+                        Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
+                )
+            )
+        ]
+        (text letter)
