@@ -139,10 +139,7 @@ view model =
 tuesdayFont : Attribute Msg
 tuesdayFont =
     Font.family
-        [ Font.external
-            { name = "Virgil"
-            , url = "https://excalidraw.com/Virgil.woff2"
-            }
+        [ Font.typeface "Virgil"
         , Font.sansSerif
         ]
 

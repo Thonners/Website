@@ -15145,9 +15145,9 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 			'background-color',
 			clr));
 };
-var $author$project$Tuesday$Hovered = {$: 'Hovered'};
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $author$project$Tuesday$Hovered = {$: 'Hovered'};
 var $mdgriffith$elm_animator$Internal$Interpolate$standardDefault = {arriveEarly: 0, arriveSlowly: 0.8, departLate: 0, departSlowly: 0.4, wobbliness: 0};
 var $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault = function (defMovement) {
 	if (defMovement.$ === 'Oscillate') {
@@ -15194,6 +15194,64 @@ var $mdgriffith$elm_ui$Element$moveUp = function (y) {
 		$mdgriffith$elm_ui$Internal$Flag$moveY,
 		$mdgriffith$elm_ui$Internal$Model$MoveY(-y));
 };
+var $author$project$Tuesday$padding = 50;
+var $mdgriffith$elm_ui$Element$Font$family = function (families) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
+		A2(
+			$mdgriffith$elm_ui$Internal$Model$FontFamily,
+			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
+			families));
+};
+var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
+var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
+var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family(
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$Font$typeface('Virgil'),
+			$mdgriffith$elm_ui$Element$Font$sansSerif
+		]));
+var $author$project$Tuesday$spacing = 1;
+var $author$project$Tuesday$verticalFontSize = function (model) {
+	return $elm$core$Basics$round(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
+};
+var $author$project$Tuesday$letterElement = F3(
+	function (model, letterIndex, _v0) {
+		var letter = _v0.a;
+		var restOfWord = _v0.b;
+		var color = _v0.c;
+		var windowWidthWithoutPadding = model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
+		var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
+		var horizontalFontSize = 0.66 * $author$project$Tuesday$verticalFontSize(model);
+		var horizontalFontSizePlusPadding = horizontalFontSize + $author$project$Tuesday$padding;
+		var leftHandOffset = (windowWidthWithoutPadding / 2) - (3.5 * horizontalFontSizePlusPadding);
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Font$color(color),
+					$mdgriffith$elm_ui$Element$Font$size(
+					$author$project$Tuesday$verticalFontSize(model)),
+					$author$project$Tuesday$tuesdayFont,
+					$mdgriffith$elm_ui$Element$Events$onMouseEnter($author$project$Tuesday$Hovered),
+					$mdgriffith$elm_ui$Element$moveRight(
+					A2(
+						$mdgriffith$elm_animator$Animator$move,
+						model.animationState,
+						function (animationHasStarted) {
+							return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(leftHandOffset + (horizontalFontSizePlusPadding * letterIndex));
+						})),
+					$mdgriffith$elm_ui$Element$moveUp(
+					A2(
+						$mdgriffith$elm_animator$Animator$move,
+						model.animationState,
+						function (animationHasStarted) {
+							return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(((windowHeightWithoutPadding / 7) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
+						}))
+				]),
+			$mdgriffith$elm_ui$Element$text(letter));
+	});
 var $mdgriffith$elm_ui$Element$padding = function (x) {
 	var f = x;
 	return A2(
@@ -15207,8 +15265,6 @@ var $mdgriffith$elm_ui$Element$padding = function (x) {
 			f,
 			f));
 };
-var $author$project$Tuesday$padding = 50;
-var $author$project$Tuesday$spacing = 1;
 var $author$project$Tuesday$tuesday = _List_fromArray(
 	[
 		_Utils_Tuple3(
@@ -15240,41 +15296,7 @@ var $author$project$Tuesday$tuesday = _List_fromArray(
 		'ields',
 		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255))
 	]);
-var $mdgriffith$elm_ui$Internal$Model$ImportFont = F2(
-	function (a, b) {
-		return {$: 'ImportFont', a: a, b: b};
-	});
-var $mdgriffith$elm_ui$Element$Font$external = function (_v0) {
-	var url = _v0.url;
-	var name = _v0.name;
-	return A2($mdgriffith$elm_ui$Internal$Model$ImportFont, name, url);
-};
-var $mdgriffith$elm_ui$Element$Font$family = function (families) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
-		A2(
-			$mdgriffith$elm_ui$Internal$Model$FontFamily,
-			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
-			families));
-};
-var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
-var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family(
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$Font$external(
-			{name: 'Virgil', url: 'https://excalidraw.com/Virgil.woff2'}),
-			$mdgriffith$elm_ui$Element$Font$sansSerif
-		]));
-var $author$project$Tuesday$verticalFontSize = function (model) {
-	return $elm$core$Basics$round(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
-};
 var $author$project$Tuesday$horizontalTuesday = function (model) {
-	var windowWidthWithoutPadding = model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
-	var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
-	var horizontalFontSize = 0.66 * $author$project$Tuesday$verticalFontSize(model);
-	var horizontalFontSizePlusPadding = horizontalFontSize + $author$project$Tuesday$padding;
-	var leftHandOffset = (windowWidthWithoutPadding / 2) - (3.5 * horizontalFontSizePlusPadding);
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
 		_List_fromArray(
@@ -15285,36 +15307,7 @@ var $author$project$Tuesday$horizontalTuesday = function (model) {
 			]),
 		A2(
 			$elm$core$List$indexedMap,
-			F2(
-				function (i, _v0) {
-					var letter = _v0.a;
-					var color = _v0.c;
-					return A2(
-						$mdgriffith$elm_ui$Element$el,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$Font$color(color),
-								$mdgriffith$elm_ui$Element$Font$size(
-								$author$project$Tuesday$verticalFontSize(model)),
-								$author$project$Tuesday$tuesdayFont,
-								$mdgriffith$elm_ui$Element$Events$onMouseEnter($author$project$Tuesday$Hovered),
-								$mdgriffith$elm_ui$Element$moveRight(
-								A2(
-									$mdgriffith$elm_animator$Animator$move,
-									model.animationState,
-									function (animationHasStarted) {
-										return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(leftHandOffset + (horizontalFontSizePlusPadding * i));
-									})),
-								$mdgriffith$elm_ui$Element$moveUp(
-								A2(
-									$mdgriffith$elm_animator$Animator$move,
-									model.animationState,
-									function (animationHasStarted) {
-										return animationHasStarted ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(((windowHeightWithoutPadding / 7) * (i + 1)) - (windowHeightWithoutPadding / 2));
-									}))
-							]),
-						$mdgriffith$elm_ui$Element$text(letter));
-				}),
+			$author$project$Tuesday$letterElement(model),
 			$author$project$Tuesday$tuesday));
 };
 var $author$project$Tuesday$verticalTuesday = function (model) {
