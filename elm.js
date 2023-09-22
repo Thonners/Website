@@ -15240,6 +15240,32 @@ var $author$project$Tuesday$tuesday = _List_fromArray(
 		'ields',
 		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255))
 	]);
+var $mdgriffith$elm_ui$Internal$Model$ImportFont = F2(
+	function (a, b) {
+		return {$: 'ImportFont', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Element$Font$external = function (_v0) {
+	var url = _v0.url;
+	var name = _v0.name;
+	return A2($mdgriffith$elm_ui$Internal$Model$ImportFont, name, url);
+};
+var $mdgriffith$elm_ui$Element$Font$family = function (families) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
+		A2(
+			$mdgriffith$elm_ui$Internal$Model$FontFamily,
+			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
+			families));
+};
+var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
+var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family(
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$Font$external(
+			{name: 'Virgil', url: 'https://excalidraw.com/Virgil.woff2'}),
+			$mdgriffith$elm_ui$Element$Font$sansSerif
+		]));
 var $author$project$Tuesday$verticalFontSize = function (model) {
 	return $elm$core$Basics$round(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
 };
@@ -15270,6 +15296,7 @@ var $author$project$Tuesday$horizontalTuesday = function (model) {
 								$mdgriffith$elm_ui$Element$Font$color(color),
 								$mdgriffith$elm_ui$Element$Font$size(
 								$author$project$Tuesday$verticalFontSize(model)),
+								$author$project$Tuesday$tuesdayFont,
 								$mdgriffith$elm_ui$Element$Events$onMouseEnter($author$project$Tuesday$Hovered),
 								$mdgriffith$elm_ui$Element$moveRight(
 								A2(
@@ -15311,6 +15338,7 @@ var $author$project$Tuesday$verticalTuesday = function (model) {
 							$mdgriffith$elm_ui$Element$Font$color(color),
 							$mdgriffith$elm_ui$Element$Font$size(
 							$author$project$Tuesday$verticalFontSize(model)),
+							$author$project$Tuesday$tuesdayFont,
 							$mdgriffith$elm_ui$Element$centerX,
 							$mdgriffith$elm_ui$Element$Events$onMouseEnter($author$project$Tuesday$Hovered),
 							$mdgriffith$elm_ui$Element$moveRight(

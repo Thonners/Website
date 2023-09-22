@@ -136,6 +136,17 @@ view model =
         tuesdayLayout
 
 
+tuesdayFont : Attribute Msg
+tuesdayFont =
+    Font.family
+        [ Font.external
+            { name = "Virgil"
+            , url = "https://excalidraw.com/Virgil.woff2"
+            }
+        , Font.sansSerif
+        ]
+
+
 horizontalTuesday : Model -> Element Msg
 horizontalTuesday model =
     let
@@ -165,6 +176,7 @@ horizontalTuesday model =
                     el
                         [ Font.color color
                         , Font.size <| verticalFontSize model
+                        , tuesdayFont
                         , Element.Events.onMouseEnter Hovered
                         , moveRight
                             (Animator.move model.animationState
@@ -205,6 +217,7 @@ verticalTuesday model =
                     el
                         [ Font.color color
                         , Font.size <| verticalFontSize model
+                        , tuesdayFont
                         , centerX
                         , Element.Events.onMouseEnter Hovered
                         , moveRight
