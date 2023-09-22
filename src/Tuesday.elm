@@ -1,6 +1,7 @@
 module Tuesday exposing (..)
 
 import Animator
+import Animator.Inline
 import Browser
 import Dict exposing (Dict)
 import Element exposing (..)
@@ -25,6 +26,13 @@ tuesday =
     ]
 
 
+type AnimationState
+    = NotStarted
+    | InitialWait
+    | SlideLeftComplete
+    | WordsDisplayed
+
+
 type State
     = Default
     | Hover
@@ -46,7 +54,7 @@ type alias ScreenSize =
 type alias Model =
     { device : Device
     , screenSize : ScreenSize
-    , animationState : Animator.Timeline Bool
+    , animationState : Animator.Timeline AnimationState
     }
 
 
@@ -54,7 +62,7 @@ init : Device -> ScreenSize -> ( Model, Cmd Msg )
 init device screenSize =
     ( { device = device
       , screenSize = screenSize
-      , animationState = Animator.init False
+      , animationState = Animator.go (Animator.seconds 2) InitialWait <| Animator.init NotStarted
       }
     , Cmd.none
     )
@@ -93,20 +101,51 @@ animator =
             )
 
 
+updateAnimationState : Model -> AnimationState -> Time.Posix -> Model
+updateAnimationState model nextState time =
+    { model | animationState = Animator.go (Animator.seconds 5) nextState model.animationState } |> Animator.update time animator
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RuntimeTriggeredAnimationStep newTime ->
-            ( model |> Animator.update newTime animator
-            , Cmd.none
-            )
+            if Animator.arrivedAt InitialWait newTime model.animationState then
+                let
+                    _ =
+                        Debug.log "Starting the animation..."
+                in
+                ( updateAnimationState model SlideLeftComplete newTime, Cmd.none )
+
+            else if Animator.arrivedAt SlideLeftComplete newTime model.animationState && Animator.current model.animationState == SlideLeftComplete then
+                let
+                    _ =
+                        Debug.log "Arrived at SlideLeftComplete: " model.animationState
+                in
+                ( updateAnimationState model WordsDisplayed newTime, Cmd.none )
+
+            else if Animator.arrivedAt WordsDisplayed newTime model.animationState then
+                let
+                    _ =
+                        Debug.log "Arrived at words displayed: " model.animationState
+                in
+                ( model |> Animator.update newTime animator, Cmd.none )
+
+            else
+                let
+                    _ =
+                        Debug.log "Tick"
+                in
+                ( model |> Animator.update newTime animator
+                , Cmd.none
+                )
 
         Hovered ->
             let
                 _ =
                     Debug.log "Hovered message sent, current status: " model.animationState
             in
-            ( { model | animationState = Animator.go Animator.verySlowly True model.animationState }
+            ( { model | animationState = Animator.go Animator.verySlowly SlideLeftComplete model.animationState }
             , Cmd.none
             )
 
@@ -164,27 +203,7 @@ verticalTuesday model =
         , Element.padding padding
         ]
         (tuesday
-            |> List.map
-                (\( letter, _, color ) ->
-                    el
-                        [ Font.color color
-                        , Font.size <| verticalFontSize model
-                        , tuesdayFont
-                        , centerX
-                        , Element.Events.onMouseEnter Hovered
-                        , moveRight
-                            (Animator.move model.animationState
-                                (\animationHasStarted ->
-                                    if animationHasStarted then
-                                        Animator.at 0
-
-                                    else
-                                        Animator.at ((toFloat model.screenSize.windowWidth / 2) - 100)
-                                )
-                            )
-                        ]
-                        (text letter)
-                )
+            |> List.indexedMap (letterElement model)
         )
 
 
@@ -212,24 +231,63 @@ letterElement model letterIndex ( letter, restOfWord, color ) =
         , tuesdayFont
         , Element.Events.onMouseEnter Hovered
         , moveRight
-            (Animator.move model.animationState
-                (\animationHasStarted ->
-                    if animationHasStarted then
-                        Animator.at 0
+            (if Animator.current model.animationState == WordsDisplayed then
+                0
 
-                    else
-                        Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
-                )
+             else
+                Animator.move model.animationState
+                    (\animationState ->
+                        if animationState == NotStarted || animationState == InitialWait then
+                            Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
+
+                        else
+                            Animator.at 0
+                    )
             )
         , moveUp
-            (Animator.move model.animationState
-                (\animationHasStarted ->
-                    if animationHasStarted then
-                        Animator.at <| 0
+            (if Animator.current model.animationState == WordsDisplayed then
+                0
 
-                    else
-                        Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
-                )
+             else
+                Animator.move model.animationState
+                    (\animationState ->
+                        if animationState == NotStarted || animationState == InitialWait then
+                            Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
+
+                        else
+                            Animator.at <| 0
+                    )
             )
         ]
-        (text letter)
+        (row []
+            [ el [ letterFadeInAnimation model letterIndex ] <| text letter
+            , el [ wordFadeInAnimation model ] <| text restOfWord
+            ]
+        )
+
+
+letterFadeInAnimation : Model -> Int -> Attribute Msg
+letterFadeInAnimation model letterIndex =
+    htmlAttribute <|
+        Animator.Inline.opacity model.animationState
+            (\state ->
+                if state == NotStarted then
+                    Animator.at 0
+
+                else
+                    Animator.at 1
+                        |> Animator.leaveLate (0.3 + 0.1 * toFloat letterIndex)
+            )
+
+
+wordFadeInAnimation : Model -> Attribute Msg
+wordFadeInAnimation model =
+    htmlAttribute <|
+        Animator.Inline.opacity model.animationState
+            (\state ->
+                if state == WordsDisplayed then
+                    Animator.at 1
+
+                else
+                    Animator.at 0
+            )
