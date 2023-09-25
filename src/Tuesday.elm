@@ -14,6 +14,26 @@ import Html exposing (Html)
 import Time
 
 
+fadeInDelayLetter : Float
+fadeInDelayLetter =
+    0.5
+
+
+fadeInDelayWord : Float
+fadeInDelayWord =
+    0.7
+
+
+padding : Int
+padding =
+    50
+
+
+spacing : Int
+spacing =
+    1
+
+
 type alias LetterDetails =
     { letter : String
     , restOfWord : String
@@ -62,16 +82,6 @@ type alias Model =
     }
 
 
-fadeInDelayLetter : Float
-fadeInDelayLetter =
-    0.5
-
-
-fadeInDelayWord : Float
-fadeInDelayWord =
-    0.7
-
-
 init : Device -> ScreenSize -> ( Model, Cmd Msg )
 init device screenSize =
     let
@@ -110,16 +120,6 @@ subscriptions model =
     -- this is where the animator will decide to have a subscription to AnimationFrame or not.
     animator
         |> Animator.toSubscription RuntimeTriggeredAnimationStep model
-
-
-padding : Int
-padding =
-    50
-
-
-spacing : Int
-spacing =
-    1
 
 
 animator : Animator.Animator Model
