@@ -255,8 +255,15 @@ upMoveAmount model letterIndex =
         windowHeightWithoutPadding =
             toFloat (model.screenSize.windowHeight - 2 * padding)
 
+        verticalOffset =
+            if fontSizeSetByHorizontalConstraint model then
+                (-3.5 + toFloat letterIndex) * toFloat (fontSize model + verticalSpacing)
+
+            else
+                (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
+
         preMovement =
-            Animator.at <| (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
+            Animator.at <| verticalOffset
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -345,6 +352,7 @@ letterFadeInAnimation model targetAnimationState =
 
 wordFadeInAnimation : Model -> AnimationState -> Attribute Msg
 wordFadeInAnimation model targetAnimationState =
+    -- TODO set display: none before we start the animations so they don't cause scrollbars
     let
         animationComplete =
             case Animator.current model.animationState of
