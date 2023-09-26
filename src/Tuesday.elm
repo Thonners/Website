@@ -29,9 +29,14 @@ padding =
     50
 
 
-spacing : Int
-spacing =
-    1
+verticalSpacing : Int
+verticalSpacing =
+    5
+
+
+letterSpacing : Int
+letterSpacing =
+    15
 
 
 fontSizeAspectRatio : Float
@@ -175,34 +180,35 @@ horizontallyDeterminedFontSize : Model -> Int
 horizontallyDeterminedFontSize model =
     let
         targetWidth =
-            toFloat (windowWidthWithoutPadding model - 6 * spacing) / 7
+            toFloat (windowWidthWithoutPadding model - 6 * letterSpacing) / 7
     in
     round <| targetWidth / fontSizeAspectRatio
 
 
 verticallyDeterminedFontSize : Model -> Int
 verticallyDeterminedFontSize model =
-    floor <| toFloat (model.screenSize.windowHeight - 2 * padding - 6 * spacing) / 7
+    floor <| toFloat (model.screenSize.windowHeight - 2 * padding - 6 * verticalSpacing) / 7
+
+
+fontSize : Model -> Int
+fontSize model =
+    min (horizontallyDeterminedFontSize model) (verticallyDeterminedFontSize model)
+
+
+fontSizeSetByHorizontalConstraint : Model -> Bool
+fontSizeSetByHorizontalConstraint model =
+    horizontallyDeterminedFontSize model < verticallyDeterminedFontSize model
 
 
 view : Model -> Html Msg
 view model =
-    let
-        tuesdayLayout =
-            case model.device.orientation of
-                Portrait ->
-                    verticalTuesday model
-
-                Landscape ->
-                    horizontalTuesday model
-    in
     layout
         [ height fill
         , width fill
         , Background.color <| rgb255 0 0 0
         , Font.color <| rgb255 255 255 255
         ]
-        tuesdayLayout
+        (tuesdayLayout model)
 
 
 tuesdayFont : Attribute Msg
@@ -213,23 +219,11 @@ tuesdayFont =
         ]
 
 
-horizontalTuesday : Model -> Element Msg
-horizontalTuesday model =
+tuesdayLayout : Model -> Element Msg
+tuesdayLayout model =
     column
         [ centerY
-        , Element.spacing spacing
-        , Element.padding padding
-        ]
-        (tuesday
-            |> List.indexedMap (letterElement model)
-        )
-
-
-verticalTuesday : Model -> Element Msg
-verticalTuesday model =
-    column
-        [ centerY
-        , Element.spacing spacing
+        , Element.spacing verticalSpacing
         , Element.padding padding
         ]
         (tuesday
@@ -239,13 +233,9 @@ verticalTuesday model =
 
 letterElement : Model -> Int -> LetterDetails -> Element Msg
 letterElement model letterIndex { letter, restOfWord, colour, targetLetterFadeInState, targetWordFadeInState } =
-    let
-        fontSize =
-            min (horizontallyDeterminedFontSize model) (verticallyDeterminedFontSize model)
-    in
     el
         [ Font.color colour
-        , Font.size <| fontSize
+        , Font.size <| fontSize model
         , tuesdayFont
 
         -- , Element.Events.onMouseEnter Hovered
@@ -290,14 +280,20 @@ rightMoveAmount : Model -> Int -> Float
 rightMoveAmount model letterIndex =
     let
         fontWidth =
-            round <| fontSizeAspectRatio * toFloat (horizontallyDeterminedFontSize model)
+            round <| fontSizeAspectRatio * toFloat (fontSize model)
 
         horizontalFontSizePlusSpacing =
-            fontWidth + spacing
+            fontWidth + letterSpacing
 
-        -- TODO: Add on leftOffset if using vertically determined font size so the letters are all close in the middle
+        leftOffset =
+            if fontSizeSetByHorizontalConstraint model then
+                0
+
+            else
+                toFloat (model.screenSize.windowWidth - 7 * horizontalFontSizePlusSpacing) / 2
+
         preMovement =
-            Animator.at <| toFloat (horizontalFontSizePlusSpacing * letterIndex)
+            Animator.at <| toFloat (horizontalFontSizePlusSpacing * letterIndex) + leftOffset
     in
     if Animator.current model.animationState == WordsDisplayed then
         0

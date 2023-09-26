@@ -15251,14 +15251,24 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
 var $author$project$Tuesday$fontSizeAspectRatio = 0.67;
-var $author$project$Tuesday$spacing = 1;
+var $author$project$Tuesday$letterSpacing = 15;
 var $author$project$Tuesday$padding = 50;
 var $author$project$Tuesday$windowWidthWithoutPadding = function (model) {
 	return model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
 };
 var $author$project$Tuesday$horizontallyDeterminedFontSize = function (model) {
-	var targetWidth = ($author$project$Tuesday$windowWidthWithoutPadding(model) - (6 * $author$project$Tuesday$spacing)) / 7;
+	var targetWidth = ($author$project$Tuesday$windowWidthWithoutPadding(model) - (6 * $author$project$Tuesday$letterSpacing)) / 7;
 	return $elm$core$Basics$round(targetWidth / $author$project$Tuesday$fontSizeAspectRatio);
+};
+var $author$project$Tuesday$verticalSpacing = 5;
+var $author$project$Tuesday$verticallyDeterminedFontSize = function (model) {
+	return $elm$core$Basics$floor(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$verticalSpacing)) / 7);
+};
+var $author$project$Tuesday$fontSize = function (model) {
+	return A2(
+		$elm$core$Basics$min,
+		$author$project$Tuesday$horizontallyDeterminedFontSize(model),
+		$author$project$Tuesday$verticallyDeterminedFontSize(model));
 };
 var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
 var $mdgriffith$elm_animator$Internal$Interpolate$standardDefault = {arriveEarly: 0, arriveSlowly: 0.8, departLate: 0, departSlowly: 0.4, wobbliness: 0};
@@ -15348,12 +15358,18 @@ var $mdgriffith$elm_ui$Element$moveUp = function (y) {
 		$mdgriffith$elm_ui$Internal$Model$MoveY(-y));
 };
 var $author$project$Tuesday$WordsDisplayed = {$: 'WordsDisplayed'};
+var $author$project$Tuesday$fontSizeSetByHorizontalConstraint = function (model) {
+	return _Utils_cmp(
+		$author$project$Tuesday$horizontallyDeterminedFontSize(model),
+		$author$project$Tuesday$verticallyDeterminedFontSize(model)) < 0;
+};
 var $author$project$Tuesday$rightMoveAmount = F2(
 	function (model, letterIndex) {
 		var fontWidth = $elm$core$Basics$round(
-			$author$project$Tuesday$fontSizeAspectRatio * $author$project$Tuesday$horizontallyDeterminedFontSize(model));
-		var horizontalFontSizePlusSpacing = fontWidth + $author$project$Tuesday$spacing;
-		var preMovement = $mdgriffith$elm_animator$Animator$at(horizontalFontSizePlusSpacing * letterIndex);
+			$author$project$Tuesday$fontSizeAspectRatio * $author$project$Tuesday$fontSize(model));
+		var horizontalFontSizePlusSpacing = fontWidth + $author$project$Tuesday$letterSpacing;
+		var leftOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? 0 : ((model.screenSize.windowWidth - (7 * horizontalFontSizePlusSpacing)) / 2);
+		var preMovement = $mdgriffith$elm_animator$Animator$at((horizontalFontSizePlusSpacing * letterIndex) + leftOffset);
 		return _Utils_eq(
 			$mdgriffith$elm_animator$Animator$current(model.animationState),
 			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
@@ -15427,9 +15443,6 @@ var $author$project$Tuesday$upMoveAmount = F2(
 				}
 			});
 	});
-var $author$project$Tuesday$verticallyDeterminedFontSize = function (model) {
-	return $elm$core$Basics$floor(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
-};
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
 };
@@ -15532,16 +15545,13 @@ var $author$project$Tuesday$letterElement = F3(
 		var colour = _v0.colour;
 		var targetLetterFadeInState = _v0.targetLetterFadeInState;
 		var targetWordFadeInState = _v0.targetWordFadeInState;
-		var fontSize = A2(
-			$elm$core$Basics$min,
-			$author$project$Tuesday$horizontallyDeterminedFontSize(model),
-			$author$project$Tuesday$verticallyDeterminedFontSize(model));
 		return A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$Font$color(colour),
-					$mdgriffith$elm_ui$Element$Font$size(fontSize),
+					$mdgriffith$elm_ui$Element$Font$size(
+					$author$project$Tuesday$fontSize(model)),
 					$author$project$Tuesday$tuesdayFont,
 					$mdgriffith$elm_ui$Element$moveRight(
 					A2($author$project$Tuesday$rightMoveAmount, model, letterIndex)),
@@ -15638,27 +15648,13 @@ var $author$project$Tuesday$tuesday = _List_fromArray(
 		$author$project$Tuesday$FadeInLetter(7),
 		$author$project$Tuesday$FadeInWord(7))
 	]);
-var $author$project$Tuesday$horizontalTuesday = function (model) {
+var $author$project$Tuesday$tuesdayLayout = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$centerY,
-				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$spacing),
-				$mdgriffith$elm_ui$Element$padding($author$project$Tuesday$padding)
-			]),
-		A2(
-			$elm$core$List$indexedMap,
-			$author$project$Tuesday$letterElement(model),
-			$author$project$Tuesday$tuesday));
-};
-var $author$project$Tuesday$verticalTuesday = function (model) {
-	return A2(
-		$mdgriffith$elm_ui$Element$column,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$centerY,
-				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$spacing),
+				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$verticalSpacing),
 				$mdgriffith$elm_ui$Element$padding($author$project$Tuesday$padding)
 			]),
 		A2(
@@ -15667,14 +15663,6 @@ var $author$project$Tuesday$verticalTuesday = function (model) {
 			$author$project$Tuesday$tuesday));
 };
 var $author$project$Tuesday$view = function (model) {
-	var tuesdayLayout = function () {
-		var _v0 = model.device.orientation;
-		if (_v0.$ === 'Portrait') {
-			return $author$project$Tuesday$verticalTuesday(model);
-		} else {
-			return $author$project$Tuesday$horizontalTuesday(model);
-		}
-	}();
 	return A2(
 		$mdgriffith$elm_ui$Element$layout,
 		_List_fromArray(
@@ -15686,7 +15674,7 @@ var $author$project$Tuesday$view = function (model) {
 				$mdgriffith$elm_ui$Element$Font$color(
 				A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 255))
 			]),
-		tuesdayLayout);
+		$author$project$Tuesday$tuesdayLayout(model));
 };
 var $author$project$Main$view = function (model) {
 	var title = function () {
