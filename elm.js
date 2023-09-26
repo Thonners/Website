@@ -15250,6 +15250,16 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 };
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $author$project$Tuesday$fontSizeAspectRatio = 0.67;
+var $author$project$Tuesday$spacing = 1;
+var $author$project$Tuesday$padding = 50;
+var $author$project$Tuesday$windowWidthWithoutPadding = function (model) {
+	return model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
+};
+var $author$project$Tuesday$horizontallyDeterminedFontSize = function (model) {
+	var targetWidth = ($author$project$Tuesday$windowWidthWithoutPadding(model) - (6 * $author$project$Tuesday$spacing)) / 7;
+	return $elm$core$Basics$round(targetWidth / $author$project$Tuesday$fontSizeAspectRatio);
+};
 var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
 var $mdgriffith$elm_animator$Internal$Interpolate$standardDefault = {arriveEarly: 0, arriveSlowly: 0.8, departLate: 0, departSlowly: 0.4, wobbliness: 0};
 var $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault = function (defMovement) {
@@ -15338,18 +15348,12 @@ var $mdgriffith$elm_ui$Element$moveUp = function (y) {
 		$mdgriffith$elm_ui$Internal$Model$MoveY(-y));
 };
 var $author$project$Tuesday$WordsDisplayed = {$: 'WordsDisplayed'};
-var $author$project$Tuesday$padding = 50;
-var $author$project$Tuesday$spacing = 1;
-var $author$project$Tuesday$verticalFontSize = function (model) {
-	return $elm$core$Basics$round(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
-};
 var $author$project$Tuesday$rightMoveAmount = F2(
 	function (model, letterIndex) {
-		var windowWidthWithoutPadding = model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
-		var horizontalFontSize = 0.66 * $author$project$Tuesday$verticalFontSize(model);
-		var horizontalFontSizePlusPadding = horizontalFontSize + $author$project$Tuesday$padding;
-		var leftHandOffset = (windowWidthWithoutPadding / 2) - (3.5 * horizontalFontSizePlusPadding);
-		var preMovement = $mdgriffith$elm_animator$Animator$at(leftHandOffset + (horizontalFontSizePlusPadding * letterIndex));
+		var fontWidth = $elm$core$Basics$round(
+			$author$project$Tuesday$fontSizeAspectRatio * $author$project$Tuesday$horizontallyDeterminedFontSize(model));
+		var horizontalFontSizePlusSpacing = fontWidth + $author$project$Tuesday$spacing;
+		var preMovement = $mdgriffith$elm_animator$Animator$at(horizontalFontSizePlusSpacing * letterIndex);
 		return _Utils_eq(
 			$mdgriffith$elm_animator$Animator$current(model.animationState),
 			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
@@ -15423,6 +15427,9 @@ var $author$project$Tuesday$upMoveAmount = F2(
 				}
 			});
 	});
+var $author$project$Tuesday$verticallyDeterminedFontSize = function (model) {
+	return $elm$core$Basics$floor(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
+};
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
 };
@@ -15525,13 +15532,16 @@ var $author$project$Tuesday$letterElement = F3(
 		var colour = _v0.colour;
 		var targetLetterFadeInState = _v0.targetLetterFadeInState;
 		var targetWordFadeInState = _v0.targetWordFadeInState;
+		var fontSize = A2(
+			$elm$core$Basics$min,
+			$author$project$Tuesday$horizontallyDeterminedFontSize(model),
+			$author$project$Tuesday$verticallyDeterminedFontSize(model));
 		return A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$Font$color(colour),
-					$mdgriffith$elm_ui$Element$Font$size(
-					$author$project$Tuesday$verticalFontSize(model)),
+					$mdgriffith$elm_ui$Element$Font$size(fontSize),
 					$author$project$Tuesday$tuesdayFont,
 					$mdgriffith$elm_ui$Element$moveRight(
 					A2($author$project$Tuesday$rightMoveAmount, model, letterIndex)),

@@ -34,6 +34,11 @@ spacing =
     1
 
 
+fontSizeAspectRatio : Float
+fontSizeAspectRatio =
+    0.67
+
+
 type alias LetterDetails =
     { letter : String
     , restOfWord : String
@@ -146,14 +151,38 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RuntimeTriggeredAnimationStep newTime ->
+            -- let
+            --     _ =
+            --         Debug.log "FontSizes: H = " (horizontallyDeterminedFontSize model)
+            --     _ =
+            --         Debug.log "FontSizes: V = " (verticallyDeterminedFontSize model)
+            --     _ =
+            --         Debug.log "WWidth: H = " model.screenSize.windowWidth
+            --     _ =
+            --         Debug.log "WHeight: V = " model.screenSize.windowHeight
+            -- in
             ( model |> Animator.update newTime animator
             , Cmd.none
             )
 
 
-verticalFontSize : Model -> Int
-verticalFontSize model =
-    round <| toFloat (model.screenSize.windowHeight - 2 * padding - 6 * spacing) / 7
+windowWidthWithoutPadding : Model -> Int
+windowWidthWithoutPadding model =
+    model.screenSize.windowWidth - 2 * padding
+
+
+horizontallyDeterminedFontSize : Model -> Int
+horizontallyDeterminedFontSize model =
+    let
+        targetWidth =
+            toFloat (windowWidthWithoutPadding model - 6 * spacing) / 7
+    in
+    round <| targetWidth / fontSizeAspectRatio
+
+
+verticallyDeterminedFontSize : Model -> Int
+verticallyDeterminedFontSize model =
+    floor <| toFloat (model.screenSize.windowHeight - 2 * padding - 6 * spacing) / 7
 
 
 view : Model -> Html Msg
@@ -210,9 +239,13 @@ verticalTuesday model =
 
 letterElement : Model -> Int -> LetterDetails -> Element Msg
 letterElement model letterIndex { letter, restOfWord, colour, targetLetterFadeInState, targetWordFadeInState } =
+    let
+        fontSize =
+            min (horizontallyDeterminedFontSize model) (verticallyDeterminedFontSize model)
+    in
     el
         [ Font.color colour
-        , Font.size <| verticalFontSize model
+        , Font.size <| fontSize
         , tuesdayFont
 
         -- , Element.Events.onMouseEnter Hovered
@@ -256,20 +289,15 @@ upMoveAmount model letterIndex =
 rightMoveAmount : Model -> Int -> Float
 rightMoveAmount model letterIndex =
     let
-        horizontalFontSize =
-            0.66 * toFloat (verticalFontSize model)
+        fontWidth =
+            round <| fontSizeAspectRatio * toFloat (horizontallyDeterminedFontSize model)
 
-        horizontalFontSizePlusPadding =
-            horizontalFontSize + toFloat padding
+        horizontalFontSizePlusSpacing =
+            fontWidth + spacing
 
-        windowWidthWithoutPadding =
-            toFloat (model.screenSize.windowWidth - 2 * padding)
-
-        leftHandOffset =
-            windowWidthWithoutPadding / 2 - (3.5 * horizontalFontSizePlusPadding)
-
+        -- TODO: Add on leftOffset if using vertically determined font size so the letters are all close in the middle
         preMovement =
-            Animator.at <| (leftHandOffset + horizontalFontSizePlusPadding * toFloat letterIndex)
+            Animator.at <| toFloat (horizontalFontSizePlusSpacing * letterIndex)
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
