@@ -33,6 +33,13 @@ type Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | GotNewScreenSize Int Int
+    | RuntimeTriggeredAnimationStep Time.Posix
+
+
+type Subscription
+    = HomePageSub (Sub Home.Msg)
+    | TuesdaySub (Sub Tuesday.Msg)
+    | NoSub
 
 
 type Page
@@ -112,7 +119,22 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Browser.Events.onResize (\w h -> GotNewScreenSize w h)
+    let
+        pageSub =
+            case model.page of
+                TuesdayPage m ->
+                    Sub.map TuesdayMsg (Tuesday.subscriptions m)
+
+                HomePage m ->
+                    Sub.map HomePageMsg (Home.subscriptions m)
+
+                NotFoundPage ->
+                    Sub.none
+    in
+    Sub.batch
+        [ Browser.Events.onResize (\w h -> GotNewScreenSize w h)
+        , pageSub
+        ]
 
 
 main : Program ScreenSize Model Msg
@@ -137,6 +159,15 @@ update msg model =
             in
             ( { model | page = HomePage updatedPageModel }
             , Cmd.map HomePageMsg updatedCmd
+            )
+
+        ( TuesdayMsg subMsg, TuesdayPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    Tuesday.update subMsg pageModel
+            in
+            ( { model | page = TuesdayPage updatedPageModel }
+            , Cmd.map TuesdayMsg updatedCmd
             )
 
         ( LinkClicked urlRequest, _ ) ->

@@ -5435,10 +5435,290 @@ var $author$project$Home$init = function (_v0) {
 		},
 		$elm$core$Platform$Cmd$none);
 };
+var $author$project$Tuesday$FadeInLetter = function (a) {
+	return {$: 'FadeInLetter', a: a};
+};
+var $author$project$Tuesday$FadeInWord = function (a) {
+	return {$: 'FadeInWord', a: a};
+};
+var $author$project$Tuesday$NotStarted = {$: 'NotStarted'};
+var $author$project$Tuesday$SlideLeft = {$: 'SlideLeft'};
+var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
+	function (a, b) {
+		return {$: 'TransitionTo', a: a, b: b};
+	});
+var $mdgriffith$elm_animator$Animator$event = $mdgriffith$elm_animator$Animator$TransitionTo;
+var $author$project$Tuesday$fadeInDelayLetter = 0.5;
+var $author$project$Tuesday$fadeInDelayWord = 0.7;
+var $mdgriffith$elm_animator$Internal$Timeline$Event = F3(
+	function (a, b, c) {
+		return {$: 'Event', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$Schedule = F3(
+	function (a, b, c) {
+		return {$: 'Schedule', a: a, b: b, c: c};
+	});
+var $ianmackenzie$elm_units$Quantity$plus = F2(
+	function (_v0, _v1) {
+		var y = _v0.a;
+		var x = _v1.a;
+		return $ianmackenzie$elm_units$Quantity$Quantity(x + y);
+	});
+var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
+	function (waiting, steps) {
+		initializeSchedule:
+		while (true) {
+			if (!steps.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				if (steps.a.$ === 'Wait') {
+					var additionalWait = steps.a.a;
+					var moreSteps = steps.b;
+					var $temp$waiting = A2($ianmackenzie$elm_units$Quantity$plus, waiting, additionalWait),
+						$temp$steps = moreSteps;
+					waiting = $temp$waiting;
+					steps = $temp$steps;
+					continue initializeSchedule;
+				} else {
+					var _v1 = steps.a;
+					var dur = _v1.a;
+					var checkpoint = _v1.b;
+					var moreSteps = steps.b;
+					return $elm$core$Maybe$Just(
+						_Utils_Tuple2(
+							A3(
+								$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+								waiting,
+								A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
+								_List_Nil),
+							moreSteps));
+				}
+			}
+		}
+	});
+var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
+};
+var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
+	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
+};
+var $mdgriffith$elm_animator$Animator$millis = $ianmackenzie$elm_units$Duration$milliseconds;
+var $ianmackenzie$elm_units$Duration$inSeconds = function (_v0) {
+	var numSeconds = _v0.a;
+	return numSeconds;
+};
+var $ianmackenzie$elm_units$Duration$inMilliseconds = function (duration) {
+	return $ianmackenzie$elm_units$Duration$inSeconds(duration) * 1000;
+};
+var $mdgriffith$elm_animator$Internal$Timeline$addToDwell = F2(
+	function (duration, maybeDwell) {
+		if (!$ianmackenzie$elm_units$Duration$inMilliseconds(duration)) {
+			return maybeDwell;
+		} else {
+			if (maybeDwell.$ === 'Nothing') {
+				return $elm$core$Maybe$Just(duration);
+			} else {
+				var existing = maybeDwell.a;
+				return $elm$core$Maybe$Just(
+					A2($ianmackenzie$elm_units$Quantity$plus, duration, existing));
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$extendEventDwell = F2(
+	function (extendBy, thisEvent) {
+		var at = thisEvent.a;
+		var ev = thisEvent.b;
+		var maybeDwell = thisEvent.c;
+		return (!$ianmackenzie$elm_units$Duration$inMilliseconds(extendBy)) ? thisEvent : A3(
+			$mdgriffith$elm_animator$Internal$Timeline$Event,
+			at,
+			ev,
+			A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, extendBy, maybeDwell));
+	});
+var $mdgriffith$elm_animator$Animator$stepsToEvents = F2(
+	function (currentStep, _v0) {
+		var delay = _v0.a;
+		var startEvent = _v0.b;
+		var events = _v0.c;
+		if (!events.b) {
+			if (currentStep.$ === 'Wait') {
+				var waiting = currentStep.a;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					A2($mdgriffith$elm_animator$Internal$Timeline$extendEventDwell, waiting, startEvent),
+					events);
+			} else {
+				var dur = currentStep.a;
+				var checkpoint = currentStep.b;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					_List_fromArray(
+						[
+							A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing)
+						]));
+			}
+		} else {
+			var _v3 = events.a;
+			var durationTo = _v3.a;
+			var recentEvent = _v3.b;
+			var maybeDwell = _v3.c;
+			var remaining = events.b;
+			if (currentStep.$ === 'Wait') {
+				var dur = currentStep.a;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3(
+							$mdgriffith$elm_animator$Internal$Timeline$Event,
+							durationTo,
+							recentEvent,
+							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
+						remaining));
+			} else {
+				var dur = currentStep.a;
+				var checkpoint = currentStep.b;
+				return _Utils_eq(checkpoint, recentEvent) ? A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3(
+							$mdgriffith$elm_animator$Internal$Timeline$Event,
+							durationTo,
+							recentEvent,
+							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
+						remaining)) : A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
+						events));
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Animator$queue = F2(
+	function (steps, _v0) {
+		var tl = _v0.a;
+		return $mdgriffith$elm_animator$Internal$Timeline$Timeline(
+			_Utils_update(
+				tl,
+				{
+					queued: function () {
+						var _v1 = tl.queued;
+						if (_v1.$ === 'Nothing') {
+							var _v2 = A2(
+								$mdgriffith$elm_animator$Animator$initializeSchedule,
+								$mdgriffith$elm_animator$Animator$millis(0),
+								steps);
+							if (_v2.$ === 'Nothing') {
+								return tl.queued;
+							} else {
+								var _v3 = _v2.a;
+								var schedule = _v3.a;
+								var otherSteps = _v3.b;
+								return $elm$core$Maybe$Just(
+									A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, schedule, otherSteps));
+							}
+						} else {
+							var queued = _v1.a;
+							return $elm$core$Maybe$Just(
+								A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, queued, steps));
+						}
+					}(),
+					running: true
+				}));
+	});
+var $mdgriffith$elm_animator$Animator$seconds = $ianmackenzie$elm_units$Duration$seconds;
+var $mdgriffith$elm_animator$Animator$Wait = function (a) {
+	return {$: 'Wait', a: a};
+};
+var $mdgriffith$elm_animator$Animator$wait = $mdgriffith$elm_animator$Animator$Wait;
 var $author$project$Tuesday$init = F2(
 	function (device, screenSize) {
+		var fadeInQueue = $mdgriffith$elm_animator$Animator$queue(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_animator$Animator$wait(
+					$mdgriffith$elm_animator$Animator$seconds(1)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+					$author$project$Tuesday$FadeInLetter(1)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+					$author$project$Tuesday$FadeInLetter(2)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+					$author$project$Tuesday$FadeInLetter(3)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+					$author$project$Tuesday$FadeInLetter(4)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+					$author$project$Tuesday$FadeInLetter(5)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+					$author$project$Tuesday$FadeInLetter(6)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+					$author$project$Tuesday$FadeInLetter(7)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds(1.5),
+					$author$project$Tuesday$SlideLeft),
+					$mdgriffith$elm_animator$Animator$wait(
+					$mdgriffith$elm_animator$Animator$seconds(0.2)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayWord),
+					$author$project$Tuesday$FadeInWord(1)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayWord),
+					$author$project$Tuesday$FadeInWord(2)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayWord),
+					$author$project$Tuesday$FadeInWord(3)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayWord),
+					$author$project$Tuesday$FadeInWord(4)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayWord),
+					$author$project$Tuesday$FadeInWord(5)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayWord),
+					$author$project$Tuesday$FadeInWord(6)),
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayWord),
+					$author$project$Tuesday$FadeInWord(7))
+				]));
 		return _Utils_Tuple2(
-			{device: device, screenSize: screenSize},
+			{
+				animationState: fadeInQueue(
+					$mdgriffith$elm_animator$Animator$init($author$project$Tuesday$NotStarted)),
+				device: device,
+				screenSize: screenSize
+			},
 			$elm$core$Platform$Cmd$none);
 	});
 var $elm$core$Platform$Cmd$map = _Platform_map;
@@ -6132,6 +6412,9 @@ var $author$project$Main$GotNewScreenSize = F2(
 	function (a, b) {
 		return {$: 'GotNewScreenSize', a: a, b: b};
 	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$map = _Platform_map;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $elm$browser$Browser$Events$Window = {$: 'Window'};
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
@@ -6423,58 +6706,8 @@ var $elm$browser$Browser$Events$onResize = function (func) {
 				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
 				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
 };
-var $author$project$Main$subscriptions = function (model) {
-	return $elm$browser$Browser$Events$onResize(
-		F2(
-			function (w, h) {
-				return A2($author$project$Main$GotNewScreenSize, w, h);
-			}));
-};
-var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
-var $elm$url$Url$addPort = F2(
-	function (maybePort, starter) {
-		if (maybePort.$ === 'Nothing') {
-			return starter;
-		} else {
-			var port_ = maybePort.a;
-			return starter + (':' + $elm$core$String$fromInt(port_));
-		}
-	});
-var $elm$url$Url$addPrefixed = F3(
-	function (prefix, maybeSegment, starter) {
-		if (maybeSegment.$ === 'Nothing') {
-			return starter;
-		} else {
-			var segment = maybeSegment.a;
-			return _Utils_ap(
-				starter,
-				_Utils_ap(prefix, segment));
-		}
-	});
-var $elm$url$Url$toString = function (url) {
-	var http = function () {
-		var _v0 = url.protocol;
-		if (_v0.$ === 'Http') {
-			return 'http://';
-		} else {
-			return 'https://';
-		}
-	}();
-	return A3(
-		$elm$url$Url$addPrefixed,
-		'#',
-		url.fragment,
-		A3(
-			$elm$url$Url$addPrefixed,
-			'?',
-			url.query,
-			_Utils_ap(
-				A2(
-					$elm$url$Url$addPort,
-					url.port_,
-					_Utils_ap(http, url.host)),
-				url.path)));
+var $author$project$Home$RuntimeTriggeredAnimationStep = function (a) {
+	return {$: 'RuntimeTriggeredAnimationStep', a: a};
 };
 var $author$project$Home$Hover = {$: 'Hover'};
 var $mdgriffith$elm_animator$Internal$Timeline$Animator = F2(
@@ -6531,19 +6764,6 @@ var $mdgriffith$elm_animator$Internal$Timeline$Occurring = F3(
 	function (a, b, c) {
 		return {$: 'Occurring', a: a, b: b, c: c};
 	});
-var $ianmackenzie$elm_units$Duration$inSeconds = function (_v0) {
-	var numSeconds = _v0.a;
-	return numSeconds;
-};
-var $ianmackenzie$elm_units$Duration$inMilliseconds = function (duration) {
-	return $ianmackenzie$elm_units$Duration$inSeconds(duration) * 1000;
-};
-var $ianmackenzie$elm_units$Quantity$plus = F2(
-	function (_v0, _v1) {
-		var y = _v0.a;
-		var x = _v1.a;
-		return $ianmackenzie$elm_units$Quantity$Quantity(x + y);
-	});
 var $mdgriffith$elm_animator$Internal$Time$advanceBy = F2(
 	function (dur, time) {
 		return A2(
@@ -6561,12 +6781,6 @@ var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 var $mdgriffith$elm_animator$Internal$Time$inMilliseconds = function (_v0) {
 	var ms = _v0.a;
 	return ms;
-};
-var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
-	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
-};
-var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
-	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
 };
 var $mdgriffith$elm_animator$Internal$Time$duration = F2(
 	function (one, two) {
@@ -7241,14 +7455,6 @@ var $mdgriffith$elm_animator$Internal$Timeline$getTransitionAt = F3(
 			}
 		}
 	});
-var $mdgriffith$elm_animator$Internal$Timeline$Schedule = F3(
-	function (a, b, c) {
-		return {$: 'Schedule', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$Event = F3(
-	function (a, b, c) {
-		return {$: 'Event', a: a, b: b, c: c};
-	});
 var $mdgriffith$elm_animator$Internal$Timeline$adjustScheduledDuration = F2(
 	function (fn, _v0) {
 		var dur = _v0.a;
@@ -7791,140 +7997,257 @@ var $author$project$Home$animator = A4(
 			$elm$core$Dict$values(buttonStates));
 	},
 	$mdgriffith$elm_animator$Animator$animator);
-var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
-var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
-	function (a, b) {
-		return {$: 'TransitionTo', a: a, b: b};
+var $elm$browser$Browser$AnimationManager$Time = function (a) {
+	return {$: 'Time', a: a};
+};
+var $elm$browser$Browser$AnimationManager$State = F3(
+	function (subs, request, oldTime) {
+		return {oldTime: oldTime, request: request, subs: subs};
 	});
-var $mdgriffith$elm_animator$Animator$event = $mdgriffith$elm_animator$Animator$TransitionTo;
-var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
-	function (waiting, steps) {
-		initializeSchedule:
-		while (true) {
-			if (!steps.b) {
-				return $elm$core$Maybe$Nothing;
+var $elm$browser$Browser$AnimationManager$init = $elm$core$Task$succeed(
+	A3($elm$browser$Browser$AnimationManager$State, _List_Nil, $elm$core$Maybe$Nothing, 0));
+var $elm$browser$Browser$AnimationManager$now = _Browser_now(_Utils_Tuple0);
+var $elm$browser$Browser$AnimationManager$rAF = _Browser_rAF(_Utils_Tuple0);
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$browser$Browser$AnimationManager$onEffects = F3(
+	function (router, subs, _v0) {
+		var request = _v0.request;
+		var oldTime = _v0.oldTime;
+		var _v1 = _Utils_Tuple2(request, subs);
+		if (_v1.a.$ === 'Nothing') {
+			if (!_v1.b.b) {
+				var _v2 = _v1.a;
+				return $elm$browser$Browser$AnimationManager$init;
 			} else {
-				if (steps.a.$ === 'Wait') {
-					var additionalWait = steps.a.a;
-					var moreSteps = steps.b;
-					var $temp$waiting = A2($ianmackenzie$elm_units$Quantity$plus, waiting, additionalWait),
-						$temp$steps = moreSteps;
-					waiting = $temp$waiting;
-					steps = $temp$steps;
-					continue initializeSchedule;
-				} else {
-					var _v1 = steps.a;
-					var dur = _v1.a;
-					var checkpoint = _v1.b;
-					var moreSteps = steps.b;
-					return $elm$core$Maybe$Just(
-						_Utils_Tuple2(
+				var _v4 = _v1.a;
+				return A2(
+					$elm$core$Task$andThen,
+					function (pid) {
+						return A2(
+							$elm$core$Task$andThen,
+							function (time) {
+								return $elm$core$Task$succeed(
+									A3(
+										$elm$browser$Browser$AnimationManager$State,
+										subs,
+										$elm$core$Maybe$Just(pid),
+										time));
+							},
+							$elm$browser$Browser$AnimationManager$now);
+					},
+					$elm$core$Process$spawn(
+						A2(
+							$elm$core$Task$andThen,
+							$elm$core$Platform$sendToSelf(router),
+							$elm$browser$Browser$AnimationManager$rAF)));
+			}
+		} else {
+			if (!_v1.b.b) {
+				var pid = _v1.a.a;
+				return A2(
+					$elm$core$Task$andThen,
+					function (_v3) {
+						return $elm$browser$Browser$AnimationManager$init;
+					},
+					$elm$core$Process$kill(pid));
+			} else {
+				return $elm$core$Task$succeed(
+					A3($elm$browser$Browser$AnimationManager$State, subs, request, oldTime));
+			}
+		}
+	});
+var $elm$browser$Browser$AnimationManager$onSelfMsg = F3(
+	function (router, newTime, _v0) {
+		var subs = _v0.subs;
+		var oldTime = _v0.oldTime;
+		var send = function (sub) {
+			if (sub.$ === 'Time') {
+				var tagger = sub.a;
+				return A2(
+					$elm$core$Platform$sendToApp,
+					router,
+					tagger(
+						$elm$time$Time$millisToPosix(newTime)));
+			} else {
+				var tagger = sub.a;
+				return A2(
+					$elm$core$Platform$sendToApp,
+					router,
+					tagger(newTime - oldTime));
+			}
+		};
+		return A2(
+			$elm$core$Task$andThen,
+			function (pid) {
+				return A2(
+					$elm$core$Task$andThen,
+					function (_v1) {
+						return $elm$core$Task$succeed(
 							A3(
-								$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-								waiting,
-								A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
-								_List_Nil),
-							moreSteps));
-				}
-			}
-		}
+								$elm$browser$Browser$AnimationManager$State,
+								subs,
+								$elm$core$Maybe$Just(pid),
+								newTime));
+					},
+					$elm$core$Task$sequence(
+						A2($elm$core$List$map, send, subs)));
+			},
+			$elm$core$Process$spawn(
+				A2(
+					$elm$core$Task$andThen,
+					$elm$core$Platform$sendToSelf(router),
+					$elm$browser$Browser$AnimationManager$rAF)));
 	});
-var $mdgriffith$elm_animator$Animator$millis = $ianmackenzie$elm_units$Duration$milliseconds;
-var $mdgriffith$elm_animator$Internal$Timeline$addToDwell = F2(
-	function (duration, maybeDwell) {
-		if (!$ianmackenzie$elm_units$Duration$inMilliseconds(duration)) {
-			return maybeDwell;
+var $elm$browser$Browser$AnimationManager$Delta = function (a) {
+	return {$: 'Delta', a: a};
+};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$browser$Browser$AnimationManager$subMap = F2(
+	function (func, sub) {
+		if (sub.$ === 'Time') {
+			var tagger = sub.a;
+			return $elm$browser$Browser$AnimationManager$Time(
+				A2($elm$core$Basics$composeL, func, tagger));
 		} else {
-			if (maybeDwell.$ === 'Nothing') {
-				return $elm$core$Maybe$Just(duration);
-			} else {
-				var existing = maybeDwell.a;
-				return $elm$core$Maybe$Just(
-					A2($ianmackenzie$elm_units$Quantity$plus, duration, existing));
-			}
+			var tagger = sub.a;
+			return $elm$browser$Browser$AnimationManager$Delta(
+				A2($elm$core$Basics$composeL, func, tagger));
 		}
 	});
-var $mdgriffith$elm_animator$Internal$Timeline$extendEventDwell = F2(
-	function (extendBy, thisEvent) {
-		var at = thisEvent.a;
-		var ev = thisEvent.b;
-		var maybeDwell = thisEvent.c;
-		return (!$ianmackenzie$elm_units$Duration$inMilliseconds(extendBy)) ? thisEvent : A3(
-			$mdgriffith$elm_animator$Internal$Timeline$Event,
-			at,
-			ev,
-			A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, extendBy, maybeDwell));
+_Platform_effectManagers['Browser.AnimationManager'] = _Platform_createManager($elm$browser$Browser$AnimationManager$init, $elm$browser$Browser$AnimationManager$onEffects, $elm$browser$Browser$AnimationManager$onSelfMsg, 0, $elm$browser$Browser$AnimationManager$subMap);
+var $elm$browser$Browser$AnimationManager$subscription = _Platform_leaf('Browser.AnimationManager');
+var $elm$browser$Browser$AnimationManager$onAnimationFrame = function (tagger) {
+	return $elm$browser$Browser$AnimationManager$subscription(
+		$elm$browser$Browser$AnimationManager$Time(tagger));
+};
+var $elm$browser$Browser$Events$onAnimationFrame = $elm$browser$Browser$AnimationManager$onAnimationFrame;
+var $mdgriffith$elm_animator$Animator$toSubscription = F3(
+	function (toMsg, model, _v0) {
+		var isRunning = _v0.a;
+		return isRunning(model) ? $elm$browser$Browser$Events$onAnimationFrame(toMsg) : $elm$core$Platform$Sub$none;
 	});
-var $mdgriffith$elm_animator$Animator$stepsToEvents = F2(
-	function (currentStep, _v0) {
-		var delay = _v0.a;
-		var startEvent = _v0.b;
-		var events = _v0.c;
-		if (!events.b) {
-			if (currentStep.$ === 'Wait') {
-				var waiting = currentStep.a;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					A2($mdgriffith$elm_animator$Internal$Timeline$extendEventDwell, waiting, startEvent),
-					events);
-			} else {
-				var dur = currentStep.a;
-				var checkpoint = currentStep.b;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					_List_fromArray(
-						[
-							A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing)
-						]));
-			}
+var $author$project$Home$subscriptions = function (model) {
+	return A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Home$RuntimeTriggeredAnimationStep, model, $author$project$Home$animator);
+};
+var $author$project$Tuesday$RuntimeTriggeredAnimationStep = function (a) {
+	return {$: 'RuntimeTriggeredAnimationStep', a: a};
+};
+var $mdgriffith$elm_animator$Animator$watching = F3(
+	function (get, set, _v0) {
+		var isRunning = _v0.a;
+		var updateModel = _v0.b;
+		return A2(
+			$mdgriffith$elm_animator$Internal$Timeline$Animator,
+			$elm$core$Basics$always(true),
+			F2(
+				function (now, model) {
+					var newModel = A2(updateModel, now, model);
+					return A2(
+						set,
+						A2(
+							$mdgriffith$elm_animator$Internal$Timeline$update,
+							now,
+							get(newModel)),
+						newModel);
+				}));
+	});
+var $author$project$Tuesday$animator = A3(
+	$mdgriffith$elm_animator$Animator$watching,
+	function ($) {
+		return $.animationState;
+	},
+	F2(
+		function (newAnimationState, model) {
+			return _Utils_update(
+				model,
+				{animationState: newAnimationState});
+		}),
+	$mdgriffith$elm_animator$Animator$animator);
+var $author$project$Tuesday$subscriptions = function (model) {
+	return A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Tuesday$RuntimeTriggeredAnimationStep, model, $author$project$Tuesday$animator);
+};
+var $author$project$Main$subscriptions = function (model) {
+	var pageSub = function () {
+		var _v0 = model.page;
+		switch (_v0.$) {
+			case 'TuesdayPage':
+				var m = _v0.a;
+				return A2(
+					$elm$core$Platform$Sub$map,
+					$author$project$Main$TuesdayMsg,
+					$author$project$Tuesday$subscriptions(m));
+			case 'HomePage':
+				var m = _v0.a;
+				return A2(
+					$elm$core$Platform$Sub$map,
+					$author$project$Main$HomePageMsg,
+					$author$project$Home$subscriptions(m));
+			default:
+				return $elm$core$Platform$Sub$none;
+		}
+	}();
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				$elm$browser$Browser$Events$onResize(
+				F2(
+					function (w, h) {
+						return A2($author$project$Main$GotNewScreenSize, w, h);
+					})),
+				pageSub
+			]));
+};
+var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $elm$url$Url$addPort = F2(
+	function (maybePort, starter) {
+		if (maybePort.$ === 'Nothing') {
+			return starter;
 		} else {
-			var _v3 = events.a;
-			var durationTo = _v3.a;
-			var recentEvent = _v3.b;
-			var maybeDwell = _v3.c;
-			var remaining = events.b;
-			if (currentStep.$ === 'Wait') {
-				var dur = currentStep.a;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3(
-							$mdgriffith$elm_animator$Internal$Timeline$Event,
-							durationTo,
-							recentEvent,
-							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
-						remaining));
-			} else {
-				var dur = currentStep.a;
-				var checkpoint = currentStep.b;
-				return _Utils_eq(checkpoint, recentEvent) ? A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3(
-							$mdgriffith$elm_animator$Internal$Timeline$Event,
-							durationTo,
-							recentEvent,
-							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
-						remaining)) : A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
-						events));
-			}
+			var port_ = maybePort.a;
+			return starter + (':' + $elm$core$String$fromInt(port_));
 		}
 	});
+var $elm$url$Url$addPrefixed = F3(
+	function (prefix, maybeSegment, starter) {
+		if (maybeSegment.$ === 'Nothing') {
+			return starter;
+		} else {
+			var segment = maybeSegment.a;
+			return _Utils_ap(
+				starter,
+				_Utils_ap(prefix, segment));
+		}
+	});
+var $elm$url$Url$toString = function (url) {
+	var http = function () {
+		var _v0 = url.protocol;
+		if (_v0.$ === 'Http') {
+			return 'http://';
+		} else {
+			return 'https://';
+		}
+	}();
+	return A3(
+		$elm$url$Url$addPrefixed,
+		'#',
+		url.fragment,
+		A3(
+			$elm$url$Url$addPrefixed,
+			'?',
+			url.query,
+			_Utils_ap(
+				A2(
+					$elm$url$Url$addPort,
+					url.port_,
+					_Utils_ap(http, url.host)),
+				url.path)));
+};
+var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
 var $mdgriffith$elm_animator$Animator$interrupt = F2(
 	function (steps, _v0) {
 		var tl = _v0.a;
@@ -8020,10 +8343,17 @@ var $author$project$Home$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Tuesday$update = F2(
+	function (msg, model) {
+		var newTime = msg.a;
+		return _Utils_Tuple2(
+			A3($mdgriffith$elm_animator$Animator$update, newTime, $author$project$Tuesday$animator, model),
+			$elm$core$Platform$Cmd$none);
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(msg, model.page);
-		_v0$3:
+		_v0$4:
 		while (true) {
 			switch (_v0.a.$) {
 				case 'HomePageMsg':
@@ -8041,7 +8371,24 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$HomePageMsg, updatedCmd));
 					} else {
-						break _v0$3;
+						break _v0$4;
+					}
+				case 'TuesdayMsg':
+					if (_v0.b.$ === 'TuesdayPage') {
+						var subMsg = _v0.a.a;
+						var pageModel = _v0.b.a;
+						var _v2 = A2($author$project$Tuesday$update, subMsg, pageModel);
+						var updatedPageModel = _v2.a;
+						var updatedCmd = _v2.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									page: $author$project$Main$TuesdayPage(updatedPageModel)
+								}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$TuesdayMsg, updatedCmd));
+					} else {
+						break _v0$4;
 					}
 				case 'LinkClicked':
 					var urlRequest = _v0.a.a;
@@ -8069,7 +8416,7 @@ var $author$project$Main$update = F2(
 								{route: newRoute}),
 							$elm$core$Platform$Cmd$none));
 				default:
-					break _v0$3;
+					break _v0$4;
 			}
 		}
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -13908,11 +14255,6 @@ var $mdgriffith$elm_ui$Element$image = F2(
 						$mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
 					])));
 	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var $mdgriffith$elm_animator$Internal$Interpolate$dwellPeriod = function (movement) {
 	if (movement.$ === 'Pos') {
 		return $elm$core$Maybe$Nothing;
@@ -14908,6 +15250,142 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 };
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $author$project$Tuesday$fontSizeAspectRatio = 0.67;
+var $author$project$Tuesday$letterSpacing = 15;
+var $author$project$Tuesday$padding = 50;
+var $author$project$Tuesday$windowWidthWithoutPadding = function (model) {
+	return model.screenSize.windowWidth - (2 * $author$project$Tuesday$padding);
+};
+var $author$project$Tuesday$horizontallyDeterminedFontSize = function (model) {
+	var targetWidth = ($author$project$Tuesday$windowWidthWithoutPadding(model) - (6 * $author$project$Tuesday$letterSpacing)) / 7;
+	return $elm$core$Basics$round(targetWidth / $author$project$Tuesday$fontSizeAspectRatio);
+};
+var $author$project$Tuesday$verticalSpacing = 5;
+var $author$project$Tuesday$verticallyDeterminedFontSize = function (model) {
+	return $elm$core$Basics$floor(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$verticalSpacing)) / 7);
+};
+var $author$project$Tuesday$fontSize = function (model) {
+	return A2(
+		$elm$core$Basics$min,
+		$author$project$Tuesday$horizontallyDeterminedFontSize(model),
+		$author$project$Tuesday$verticallyDeterminedFontSize(model));
+};
+var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
+var $mdgriffith$elm_animator$Internal$Interpolate$standardDefault = {arriveEarly: 0, arriveSlowly: 0.8, departLate: 0, departSlowly: 0.4, wobbliness: 0};
+var $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault = function (defMovement) {
+	if (defMovement.$ === 'Oscillate') {
+		var specifiedPersonality = defMovement.a;
+		var period = defMovement.b;
+		var fn = defMovement.c;
+		var personality = A2($mdgriffith$elm_animator$Internal$Interpolate$fillDefaults, $mdgriffith$elm_animator$Internal$Interpolate$standardDefault, specifiedPersonality);
+		return A3($mdgriffith$elm_animator$Internal$Interpolate$Osc, personality, period, fn);
+	} else {
+		var specifiedPersonality = defMovement.a;
+		var p = defMovement.b;
+		var personality = A2($mdgriffith$elm_animator$Internal$Interpolate$fillDefaults, $mdgriffith$elm_animator$Internal$Interpolate$standardDefault, specifiedPersonality);
+		return A2($mdgriffith$elm_animator$Internal$Interpolate$Pos, personality, p);
+	}
+};
+var $mdgriffith$elm_animator$Animator$move = F2(
+	function (timeline, lookup) {
+		return A2(
+			$mdgriffith$elm_animator$Internal$Interpolate$details,
+			timeline,
+			A2($elm$core$Basics$composeL, $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault, lookup)).position;
+	});
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $mdgriffith$elm_animator$Animator$Inline$style = F4(
+	function (timeline, name, toString, lookup) {
+		return A2(
+			$elm$html$Html$Attributes$style,
+			name,
+			toString(
+				A2($mdgriffith$elm_animator$Animator$move, timeline, lookup)));
+	});
+var $mdgriffith$elm_animator$Animator$Inline$opacity = F2(
+	function (timeline, lookup) {
+		return A4($mdgriffith$elm_animator$Animator$Inline$style, timeline, 'opacity', $elm$core$String$fromFloat, lookup);
+	});
+var $author$project$Tuesday$letterFadeInAnimation = F2(
+	function (model, targetAnimationState) {
+		var animationComplete = function () {
+			var _v0 = $mdgriffith$elm_animator$Animator$current(model.animationState);
+			switch (_v0.$) {
+				case 'FadeInLetter':
+					var currentI = _v0.a;
+					if (targetAnimationState.$ === 'FadeInLetter') {
+						var targetI = targetAnimationState.a;
+						return _Utils_cmp(currentI, targetI) > 0;
+					} else {
+						return false;
+					}
+				case 'NotStarted':
+					return false;
+				default:
+					return true;
+			}
+		}();
+		return $mdgriffith$elm_ui$Element$htmlAttribute(
+			A2(
+				$mdgriffith$elm_animator$Animator$Inline$opacity,
+				model.animationState,
+				function (state) {
+					return (_Utils_eq(state, targetAnimationState) || animationComplete) ? $mdgriffith$elm_animator$Animator$at(1) : $mdgriffith$elm_animator$Animator$at(0);
+				}));
+	});
+var $mdgriffith$elm_ui$Internal$Model$MoveX = function (a) {
+	return {$: 'MoveX', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$TransformComponent = F2(
+	function (a, b) {
+		return {$: 'TransformComponent', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$moveX = $mdgriffith$elm_ui$Internal$Flag$flag(25);
+var $mdgriffith$elm_ui$Element$moveRight = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
+		$mdgriffith$elm_ui$Internal$Flag$moveX,
+		$mdgriffith$elm_ui$Internal$Model$MoveX(x));
+};
+var $mdgriffith$elm_ui$Internal$Model$MoveY = function (a) {
+	return {$: 'MoveY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Flag$moveY = $mdgriffith$elm_ui$Internal$Flag$flag(26);
+var $mdgriffith$elm_ui$Element$moveUp = function (y) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
+		$mdgriffith$elm_ui$Internal$Flag$moveY,
+		$mdgriffith$elm_ui$Internal$Model$MoveY(-y));
+};
+var $author$project$Tuesday$WordsDisplayed = {$: 'WordsDisplayed'};
+var $author$project$Tuesday$fontSizeSetByHorizontalConstraint = function (model) {
+	return _Utils_cmp(
+		$author$project$Tuesday$horizontallyDeterminedFontSize(model),
+		$author$project$Tuesday$verticallyDeterminedFontSize(model)) < 0;
+};
+var $author$project$Tuesday$rightMoveAmount = F2(
+	function (model, letterIndex) {
+		var fontWidth = $elm$core$Basics$round(
+			$author$project$Tuesday$fontSizeAspectRatio * $author$project$Tuesday$fontSize(model));
+		var horizontalFontSizePlusSpacing = fontWidth + $author$project$Tuesday$letterSpacing;
+		var leftOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? 0 : ((model.screenSize.windowWidth - (7 * horizontalFontSizePlusSpacing)) / 2);
+		var preMovement = $mdgriffith$elm_animator$Animator$at((horizontalFontSizePlusSpacing * letterIndex) + leftOffset);
+		return _Utils_eq(
+			$mdgriffith$elm_animator$Animator$current(model.animationState),
+			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
+			$mdgriffith$elm_animator$Animator$move,
+			model.animationState,
+			function (animationState) {
+				switch (animationState.$) {
+					case 'NotStarted':
+						return preMovement;
+					case 'FadeInLetter':
+						return preMovement;
+					default:
+						return $mdgriffith$elm_animator$Animator$at(0);
+				}
+			});
+	});
 var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
 var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
 var $mdgriffith$elm_ui$Element$row = F2(
@@ -14928,56 +15406,202 @@ var $mdgriffith$elm_ui$Element$row = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var $author$project$Tuesday$tuesday = _List_fromArray(
-	[
-		_Utils_Tuple3(
-		'T',
-		'rain',
-		A3($mdgriffith$elm_ui$Element$rgb255, 255, 0, 0)),
-		_Utils_Tuple3(
-		'U',
-		'ntil',
-		A3($mdgriffith$elm_ui$Element$rgb255, 220, 100, 23)),
-		_Utils_Tuple3(
-		'E',
-		'very',
-		A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 0)),
-		_Utils_Tuple3(
-		'S',
-		'inue',
-		A3($mdgriffith$elm_ui$Element$rgb255, 0, 255, 0)),
-		_Utils_Tuple3(
-		'D',
-		'evelops',
-		A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 255)),
-		_Utils_Tuple3(
-		'A',
-		'nd',
-		A3($mdgriffith$elm_ui$Element$rgb255, 75, 0, 130)),
-		_Utils_Tuple3(
-		'Y',
-		'ields',
-		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255))
-	]);
-var $author$project$Tuesday$horizontalTuesday = A2(
-	$mdgriffith$elm_ui$Element$row,
+var $mdgriffith$elm_ui$Element$Font$family = function (families) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
+		A2(
+			$mdgriffith$elm_ui$Internal$Model$FontFamily,
+			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
+			families));
+};
+var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
+var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
+var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family(
 	_List_fromArray(
-		[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
-	A2(
-		$elm$core$List$map,
-		function (_v0) {
-			var letter = _v0.a;
-			var color = _v0.c;
+		[
+			$mdgriffith$elm_ui$Element$Font$typeface('Virgil'),
+			$mdgriffith$elm_ui$Element$Font$sansSerif
+		]));
+var $author$project$Tuesday$upMoveAmount = F2(
+	function (model, letterIndex) {
+		var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
+		var verticalOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? (((-1.5) + letterIndex) * ($author$project$Tuesday$fontSize(model) + $author$project$Tuesday$verticalSpacing)) : (((windowHeightWithoutPadding / 7) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
+		var preMovement = $mdgriffith$elm_animator$Animator$at(verticalOffset);
+		return _Utils_eq(
+			$mdgriffith$elm_animator$Animator$current(model.animationState),
+			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
+			$mdgriffith$elm_animator$Animator$move,
+			model.animationState,
+			function (animationState) {
+				switch (animationState.$) {
+					case 'NotStarted':
+						return preMovement;
+					case 'FadeInLetter':
+						return preMovement;
+					default:
+						return $mdgriffith$elm_animator$Animator$at(0);
+				}
+			});
+	});
+var $author$project$Tuesday$wordAppearAnimation = function (model) {
+	var stateValueToString = function (value) {
+		return (value > 0) ? 'flex' : 'none';
+	};
+	var showWord = function (state) {
+		switch (state.$) {
+			case 'NotStarted':
+				return $mdgriffith$elm_animator$Animator$at(0);
+			case 'FadeInLetter':
+				return $mdgriffith$elm_animator$Animator$at(0);
+			case 'SlideLeft':
+				return $mdgriffith$elm_animator$Animator$at(0);
+			case 'FadeInWord':
+				return $mdgriffith$elm_animator$Animator$at(1);
+			default:
+				return $mdgriffith$elm_animator$Animator$at(1);
+		}
+	};
+	return $mdgriffith$elm_ui$Element$htmlAttribute(
+		A4($mdgriffith$elm_animator$Animator$Inline$style, model.animationState, 'display', stateValueToString, showWord));
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
+	return {$: 'Specified', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
+	function (a, b, c) {
+		return {$: 'Oscillate', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
+	return {$: 'PartialDefault', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
+var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
+var $mdgriffith$elm_animator$Animator$withDefault = F2(
+	function (toDef, currentDefault) {
+		if (currentDefault.$ === 'FullDefault') {
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
+		} else {
+			var thing = currentDefault.a;
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef(thing));
+		}
+	});
+var $mdgriffith$elm_animator$Animator$applyOption = F2(
+	function (toOption, movement) {
+		if (movement.$ === 'Position') {
+			var personality = movement.a;
+			var pos = movement.b;
 			return A2(
-				$mdgriffith$elm_ui$Element$el,
+				$mdgriffith$elm_animator$Internal$Interpolate$Position,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				pos);
+		} else {
+			var personality = movement.a;
+			var dur = movement.b;
+			var fn = movement.c;
+			return A3(
+				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				dur,
+				fn);
+		}
+	});
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $mdgriffith$elm_animator$Animator$leaveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
+var $author$project$Tuesday$wordFadeInAnimation = F2(
+	function (model, targetAnimationState) {
+		var animationComplete = function () {
+			var _v0 = $mdgriffith$elm_animator$Animator$current(model.animationState);
+			switch (_v0.$) {
+				case 'FadeInWord':
+					var currentI = _v0.a;
+					if (targetAnimationState.$ === 'FadeInWord') {
+						var targetI = targetAnimationState.a;
+						return _Utils_cmp(currentI, targetI) > 0;
+					} else {
+						return false;
+					}
+				case 'NotStarted':
+					return false;
+				case 'FadeInLetter':
+					return false;
+				case 'SlideLeft':
+					return false;
+				default:
+					return true;
+			}
+		}();
+		return $mdgriffith$elm_ui$Element$htmlAttribute(
+			A2(
+				$mdgriffith$elm_animator$Animator$Inline$opacity,
+				model.animationState,
+				function (state) {
+					return (_Utils_eq(state, targetAnimationState) || animationComplete) ? A2(
+						$mdgriffith$elm_animator$Animator$leaveSmoothly,
+						0.8,
+						$mdgriffith$elm_animator$Animator$at(1)) : $mdgriffith$elm_animator$Animator$at(0);
+				}));
+	});
+var $author$project$Tuesday$letterElement = F3(
+	function (model, letterIndex, _v0) {
+		var letter = _v0.letter;
+		var restOfWord = _v0.restOfWord;
+		var colour = _v0.colour;
+		var targetLetterFadeInState = _v0.targetLetterFadeInState;
+		var targetWordFadeInState = _v0.targetWordFadeInState;
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Font$color(colour),
+					$mdgriffith$elm_ui$Element$Font$size(
+					$author$project$Tuesday$fontSize(model)),
+					$author$project$Tuesday$tuesdayFont,
+					$mdgriffith$elm_ui$Element$moveRight(
+					A2($author$project$Tuesday$rightMoveAmount, model, letterIndex)),
+					$mdgriffith$elm_ui$Element$moveUp(
+					A2($author$project$Tuesday$upMoveAmount, model, letterIndex))
+				]),
+			A2(
+				$mdgriffith$elm_ui$Element$row,
+				_List_Nil,
 				_List_fromArray(
 					[
-						$mdgriffith$elm_ui$Element$Font$color(color),
-						$mdgriffith$elm_ui$Element$Font$size(200)
-					]),
-				$mdgriffith$elm_ui$Element$text(letter));
-		},
-		$author$project$Tuesday$tuesday));
+						A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								A2($author$project$Tuesday$letterFadeInAnimation, model, targetLetterFadeInState)
+							]),
+						$mdgriffith$elm_ui$Element$text(letter)),
+						A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								A2($author$project$Tuesday$wordFadeInAnimation, model, targetWordFadeInState),
+								$author$project$Tuesday$wordAppearAnimation(model)
+							]),
+						$mdgriffith$elm_ui$Element$text(restOfWord))
+					])));
+	});
 var $mdgriffith$elm_ui$Element$padding = function (x) {
 	var f = x;
 	return A2(
@@ -14991,47 +15615,77 @@ var $mdgriffith$elm_ui$Element$padding = function (x) {
 			f,
 			f));
 };
-var $author$project$Tuesday$padding = 50;
-var $author$project$Tuesday$spacing = 1;
-var $author$project$Tuesday$verticalFontSize = function (model) {
-	return $elm$core$Basics$round(((model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding)) - (6 * $author$project$Tuesday$spacing)) / 7);
-};
-var $author$project$Tuesday$verticalTuesday = function (model) {
+var $author$project$Tuesday$LetterDetails = F5(
+	function (letter, restOfWord, colour, targetLetterFadeInState, targetWordFadeInState) {
+		return {colour: colour, letter: letter, restOfWord: restOfWord, targetLetterFadeInState: targetLetterFadeInState, targetWordFadeInState: targetWordFadeInState};
+	});
+var $author$project$Tuesday$tuesday = _List_fromArray(
+	[
+		A5(
+		$author$project$Tuesday$LetterDetails,
+		'T',
+		'rain',
+		A3($mdgriffith$elm_ui$Element$rgb255, 255, 0, 0),
+		$author$project$Tuesday$FadeInLetter(1),
+		$author$project$Tuesday$FadeInWord(1)),
+		A5(
+		$author$project$Tuesday$LetterDetails,
+		'U',
+		'ntil',
+		A3($mdgriffith$elm_ui$Element$rgb255, 220, 100, 23),
+		$author$project$Tuesday$FadeInLetter(2),
+		$author$project$Tuesday$FadeInWord(2)),
+		A5(
+		$author$project$Tuesday$LetterDetails,
+		'E',
+		'very',
+		A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 0),
+		$author$project$Tuesday$FadeInLetter(3),
+		$author$project$Tuesday$FadeInWord(3)),
+		A5(
+		$author$project$Tuesday$LetterDetails,
+		'S',
+		'inue',
+		A3($mdgriffith$elm_ui$Element$rgb255, 0, 255, 0),
+		$author$project$Tuesday$FadeInLetter(4),
+		$author$project$Tuesday$FadeInWord(4)),
+		A5(
+		$author$project$Tuesday$LetterDetails,
+		'D',
+		'evelops',
+		A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 255),
+		$author$project$Tuesday$FadeInLetter(5),
+		$author$project$Tuesday$FadeInWord(5)),
+		A5(
+		$author$project$Tuesday$LetterDetails,
+		'A',
+		'nd',
+		A3($mdgriffith$elm_ui$Element$rgb255, 75, 0, 130),
+		$author$project$Tuesday$FadeInLetter(6),
+		$author$project$Tuesday$FadeInWord(6)),
+		A5(
+		$author$project$Tuesday$LetterDetails,
+		'Y',
+		'ields',
+		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255),
+		$author$project$Tuesday$FadeInLetter(7),
+		$author$project$Tuesday$FadeInWord(7))
+	]);
+var $author$project$Tuesday$tuesdayLayout = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$centerY,
-				$mdgriffith$elm_ui$Element$centerX,
-				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$spacing),
+				$mdgriffith$elm_ui$Element$spacing($author$project$Tuesday$verticalSpacing),
 				$mdgriffith$elm_ui$Element$padding($author$project$Tuesday$padding)
 			]),
 		A2(
-			$elm$core$List$map,
-			function (_v0) {
-				var letter = _v0.a;
-				var color = _v0.c;
-				return A2(
-					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$Font$color(color),
-							$mdgriffith$elm_ui$Element$Font$size(
-							$author$project$Tuesday$verticalFontSize(model))
-						]),
-					$mdgriffith$elm_ui$Element$text(letter));
-			},
+			$elm$core$List$indexedMap,
+			$author$project$Tuesday$letterElement(model),
 			$author$project$Tuesday$tuesday));
 };
 var $author$project$Tuesday$view = function (model) {
-	var tuesdayLayout = function () {
-		var _v0 = model.device.orientation;
-		if (_v0.$ === 'Portrait') {
-			return $author$project$Tuesday$verticalTuesday(model);
-		} else {
-			return $author$project$Tuesday$horizontalTuesday;
-		}
-	}();
 	return A2(
 		$mdgriffith$elm_ui$Element$layout,
 		_List_fromArray(
@@ -15043,7 +15697,7 @@ var $author$project$Tuesday$view = function (model) {
 				$mdgriffith$elm_ui$Element$Font$color(
 				A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 255))
 			]),
-		tuesdayLayout);
+		$author$project$Tuesday$tuesdayLayout(model));
 };
 var $author$project$Main$view = function (model) {
 	var title = function () {
