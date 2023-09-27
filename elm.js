@@ -15444,6 +15444,27 @@ var $author$project$Tuesday$upMoveAmount = F2(
 				}
 			});
 	});
+var $author$project$Tuesday$wordAppearAnimation = function (model) {
+	var stateValueToString = function (value) {
+		return (value > 0) ? 'flex' : 'none';
+	};
+	var showWord = function (state) {
+		switch (state.$) {
+			case 'NotStarted':
+				return $mdgriffith$elm_animator$Animator$at(0);
+			case 'FadeInLetter':
+				return $mdgriffith$elm_animator$Animator$at(0);
+			case 'SlideLeft':
+				return $mdgriffith$elm_animator$Animator$at(0);
+			case 'FadeInWord':
+				return $mdgriffith$elm_animator$Animator$at(1);
+			default:
+				return $mdgriffith$elm_animator$Animator$at(1);
+		}
+	};
+	return $mdgriffith$elm_ui$Element$htmlAttribute(
+		A4($mdgriffith$elm_animator$Animator$Inline$style, model.animationState, 'display', stateValueToString, showWord));
+};
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
 };
@@ -15575,7 +15596,8 @@ var $author$project$Tuesday$letterElement = F3(
 						$mdgriffith$elm_ui$Element$el,
 						_List_fromArray(
 							[
-								A2($author$project$Tuesday$wordFadeInAnimation, model, targetWordFadeInState)
+								A2($author$project$Tuesday$wordFadeInAnimation, model, targetWordFadeInState),
+								$author$project$Tuesday$wordAppearAnimation(model)
 							]),
 						$mdgriffith$elm_ui$Element$text(restOfWord))
 					])));

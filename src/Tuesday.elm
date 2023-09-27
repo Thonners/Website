@@ -244,7 +244,7 @@ letterElement model letterIndex { letter, restOfWord, colour, targetLetterFadeIn
         ]
         (row []
             [ el [ letterFadeInAnimation model targetLetterFadeInState ] <| text letter
-            , el [ wordFadeInAnimation model targetWordFadeInState ] <| text restOfWord
+            , el [ wordFadeInAnimation model targetWordFadeInState, wordAppearAnimation model ] <| text restOfWord
             ]
         )
 
@@ -386,3 +386,38 @@ wordFadeInAnimation model targetAnimationState =
                 else
                     Animator.at 0
             )
+
+
+wordAppearAnimation : Model -> Attribute Msg
+wordAppearAnimation model =
+    let
+        showWord state =
+            case state of
+                -- case Animator.current model.animationState of
+                NotStarted ->
+                    Animator.at 0
+
+                FadeInLetter _ ->
+                    Animator.at 0
+
+                SlideLeft ->
+                    Animator.at 0
+
+                FadeInWord _ ->
+                    Animator.at 1
+
+                WordsDisplayed ->
+                    Animator.at 1
+
+        stateValueToString value =
+            if value > 0 then
+                "flex"
+
+            else
+                "none"
+    in
+    htmlAttribute <|
+        Animator.Inline.style model.animationState
+            "display"
+            stateValueToString
+            showWord
