@@ -2,3 +2,8 @@
 elm-stuff
 # elm-repl generated files
 repl-temp-*
+
+# Stuff for local builds
+404.html
+package.json
+package-lock.json
