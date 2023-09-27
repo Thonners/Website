@@ -15426,7 +15426,7 @@ var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family
 var $author$project$Tuesday$upMoveAmount = F2(
 	function (model, letterIndex) {
 		var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
-		var verticalOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? (((-3.5) + letterIndex) * ($author$project$Tuesday$fontSize(model) + $author$project$Tuesday$verticalSpacing)) : (((windowHeightWithoutPadding / 7) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
+		var verticalOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? (((-1.5) + letterIndex) * ($author$project$Tuesday$fontSize(model) + $author$project$Tuesday$verticalSpacing)) : (((windowHeightWithoutPadding / 7) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
 		var preMovement = $mdgriffith$elm_animator$Animator$at(verticalOffset);
 		return _Utils_eq(
 			$mdgriffith$elm_animator$Animator$current(model.animationState),

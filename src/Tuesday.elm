@@ -257,7 +257,8 @@ upMoveAmount model letterIndex =
 
         verticalOffset =
             if fontSizeSetByHorizontalConstraint model then
-                (-3.5 + toFloat letterIndex) * toFloat (fontSize model + verticalSpacing)
+                -- 3.5 would be the value to put it in the middle of the screen, but it looks better a bit higher up
+                (-1.5 + toFloat letterIndex) * toFloat (fontSize model + verticalSpacing)
 
             else
                 (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
