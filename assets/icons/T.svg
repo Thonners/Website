@@ -23,7 +23,11 @@
      id="defs2">
     <linearGradient
        inkscape:collect="always"
-       id="linearGradient964">
+       id="linearGradient964" 
+       x1="0"
+       x2=".3"
+       y1="0"
+       y2="1">
       <stop
          style="stop-color:#ff0000;stop-opacity:1;"
          offset="0"
@@ -34,39 +38,30 @@
          id="stop968" />
       <stop
          style="stop-color:#ebff00;stop-opacity:1;"
-         offset="0.36955991"
+         offset="0.35"
          id="stop970" />
       <stop
          style="stop-color:#4aff00;stop-opacity:1;"
-         offset="0.49944508"
+         offset="0.5"
          id="stop972" />
       <stop
          style="stop-color:#007cff;stop-opacity:1;"
-         offset="0.62869388"
+         offset="0.65"
          id="stop974" />
       <stop
          style="stop-color:#6c00ff;stop-opacity:1;"
-         offset="0.80000001"
+         offset="0.85"
          id="stop976" />
       <stop
          style="stop-color:#c000ff;stop-opacity:1;"
          offset="1"
          id="stop962" />
     </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient964"
-       id="linearGradient966"
-       x1="13.42"
-       y1="68.08"
-       x2="114.58"
-       y2="68.08"
-       gradientUnits="userSpaceOnUse" />
   </defs>
   <g
      id="SVGRepo_iconCarrier"
      transform="translate(-3.8057553,-7.655563)"
-     style="fill-opacity:1;fill:url(#linearGradient966)">
+     style="fill-opacity:1;fill:url(#linearGradient964)">
     <path
        d="M 111.84,15.36 H 16.16 c -1.24,0 -2.24,1 -2.24,2.24 v 17.99 c 0,1.24 1,2.24 2.24,2.24 h 34.65 v 80.73 c 0,1.24 1,2.24 2.24,2.24 h 21.9 c 1.24,0 2.24,-1 2.24,-2.24 V 37.83 h 34.65 c 1.24,0 2.24,-1 2.24,-2.24 V 17.6 c 0,-1.24 -1,-2.24 -2.24,-2.24 z"
        id="path93" />

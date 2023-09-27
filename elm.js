@@ -5420,21 +5420,24 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 		});
 };
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Home$init = function (_v0) {
-	return _Utils_Tuple2(
-		{
-			linkButtonStates: $mdgriffith$elm_animator$Animator$init(
-				$elm$core$Dict$fromList(
-					A2(
-						$elm$core$List$map,
-						function (icon) {
-							return _Utils_Tuple2(icon.filename, $author$project$Home$Default);
-						},
-						$author$project$Home$icons))),
-			status: $author$project$Home$InitialStatus
-		},
-		$elm$core$Platform$Cmd$none);
-};
+var $author$project$Home$init = F2(
+	function (device, screenSize) {
+		return _Utils_Tuple2(
+			{
+				device: device,
+				linkButtonStates: $mdgriffith$elm_animator$Animator$init(
+					$elm$core$Dict$fromList(
+						A2(
+							$elm$core$List$map,
+							function (icon) {
+								return _Utils_Tuple2(icon.filename, $author$project$Home$Default);
+							},
+							$author$project$Home$icons))),
+				screenSize: screenSize,
+				status: $author$project$Home$InitialStatus
+			},
+			$elm$core$Platform$Cmd$none);
+	});
 var $author$project$Tuesday$FadeInLetter = function (a) {
 	return {$: 'FadeInLetter', a: a};
 };
@@ -5731,7 +5734,7 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 			case 'NotFound':
 				return _Utils_Tuple2($author$project$Main$NotFoundPage, $elm$core$Platform$Cmd$none);
 			case 'Home':
-				var _v3 = $author$project$Home$init(_Utils_Tuple0);
+				var _v3 = A2($author$project$Home$init, model.device, model.screenSize);
 				var pageModel = _v3.a;
 				var pageCmds = _v3.b;
 				return _Utils_Tuple2(
@@ -15168,49 +15171,60 @@ var $mdgriffith$elm_ui$Internal$Model$Bottom = {$: 'Bottom'};
 var $mdgriffith$elm_ui$Element$alignBottom = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$Bottom);
 var $mdgriffith$elm_ui$Internal$Flag$fontWeight = $mdgriffith$elm_ui$Internal$Flag$flag(13);
 var $mdgriffith$elm_ui$Element$Font$bold = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontWeight, $mdgriffith$elm_ui$Internal$Style$classes.bold);
+var $author$project$Home$headerFontSize = function (model) {
+	var divisor = _Utils_eq(model.device.orientation, $mdgriffith$elm_ui$Element$Landscape) ? 30 : 15;
+	return $elm$core$Basics$round(model.screenSize.windowWidth / divisor);
+};
 var $author$project$Home$mtName = 'MATHONWY THOMAS';
-var $elm$core$Basics$pow = _Basics_pow;
-var $mdgriffith$elm_ui$Element$modular = F3(
-	function (normal, ratio, rescale) {
-		return (!rescale) ? normal : ((rescale < 0) ? (normal * A2($elm$core$Basics$pow, ratio, rescale)) : (normal * A2($elm$core$Basics$pow, ratio, rescale - 1)));
-	});
-var $author$project$Home$scaled = A2($mdgriffith$elm_ui$Element$modular, 18, 1.25);
 var $mdgriffith$elm_ui$Element$Font$size = function (i) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
 		$mdgriffith$elm_ui$Internal$Flag$fontSize,
 		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
 };
-var $author$project$Home$nameView = A2(
-	$mdgriffith$elm_ui$Element$el,
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$Font$size(
-			$elm$core$Basics$round(
-				$author$project$Home$scaled(5))),
-			$mdgriffith$elm_ui$Element$Font$bold
-		]),
-	$mdgriffith$elm_ui$Element$text($author$project$Home$mtName));
+var $author$project$Home$nameView = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Font$size(
+				$author$project$Home$headerFontSize(model)),
+				$mdgriffith$elm_ui$Element$Font$bold
+			]),
+		$mdgriffith$elm_ui$Element$text($author$project$Home$mtName));
+};
 var $author$project$Home$mtCaption = '<Insert witty caption here>';
-var $author$project$Home$subcaptionView = A2(
-	$mdgriffith$elm_ui$Element$el,
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$Font$size(
-			$elm$core$Basics$round(
-				$author$project$Home$scaled(1)))
-		]),
-	$mdgriffith$elm_ui$Element$text($author$project$Home$mtCaption));
-var $author$project$Home$textView = A2(
-	$mdgriffith$elm_ui$Element$column,
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$alignBottom,
-			A2($mdgriffith$elm_ui$Element$paddingXY, 500, 50),
-			$mdgriffith$elm_ui$Element$spacing(3)
-		]),
-	_List_fromArray(
-		[$author$project$Home$nameView, $author$project$Home$subcaptionView]));
+var $author$project$Home$subheaderFontSize = function (model) {
+	return $elm$core$Basics$round(
+		$author$project$Home$headerFontSize(model) / 2);
+};
+var $author$project$Home$subcaptionView = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Font$size(
+				$author$project$Home$subheaderFontSize(model))
+			]),
+		$mdgriffith$elm_ui$Element$text($author$project$Home$mtCaption));
+};
+var $author$project$Home$textView = function (model) {
+	var verticalPadding = $elm$core$Basics$round(model.screenSize.windowHeight / 10);
+	var horizontalPadding = $elm$core$Basics$round(model.screenSize.windowWidth / 7);
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$alignBottom,
+				A2($mdgriffith$elm_ui$Element$paddingXY, horizontalPadding, verticalPadding),
+				$mdgriffith$elm_ui$Element$spacing(3)
+			]),
+		_List_fromArray(
+			[
+				$author$project$Home$nameView(model),
+				$author$project$Home$subcaptionView(model)
+			]));
+};
 var $author$project$Home$wrapperView = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
@@ -15222,7 +15236,7 @@ var $author$project$Home$wrapperView = function (model) {
 		_List_fromArray(
 			[
 				$author$project$Home$linksView(model),
-				$author$project$Home$textView
+				$author$project$Home$textView(model)
 			]));
 };
 var $author$project$Home$view = function (model) {

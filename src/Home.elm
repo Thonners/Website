@@ -1,13 +1,13 @@
 module Home exposing (..)
 
 import Animator
-import Browser
 import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Events
 import Element.Font as Font
 import Html exposing (Html)
+import Responsive exposing (ScreenSize)
 import Time
 
 
@@ -73,7 +73,9 @@ type alias ButtonId =
 
 
 type alias Model =
-    { status : Status
+    { device : Device
+    , screenSize : ScreenSize
+    , status : Status
     , linkButtonStates : Animator.Timeline (Dict ButtonId State)
     }
 
@@ -111,25 +113,17 @@ animator =
             (\buttonStates -> List.any ((==) Hover) <| Dict.values buttonStates)
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( { status = InitialStatus
+init : Device -> ScreenSize -> ( Model, Cmd Msg )
+init device screenSize =
+    ( { device = device
+      , screenSize = screenSize
+      , status = InitialStatus
       , linkButtonStates =
             Animator.init <|
                 Dict.fromList (List.map (\icon -> ( icon.filename, Default )) icons)
       }
     , Cmd.none
     )
-
-
-main : Program () Model Msg
-main =
-    Browser.document
-        { init = init
-        , view = \model -> { title = "Mathonwy Thomas", body = [ view model ] }
-        , update = update
-        , subscriptions = subscriptions
-        }
 
 
 subscriptions : Model -> Sub Msg
@@ -180,24 +174,49 @@ scaled =
     Element.modular 18 1.25
 
 
-nameView : Element msg
-nameView =
-    el [ Font.size (round (scaled 5)), Font.bold ] (text mtName)
+headerFontSize : Model -> Int
+headerFontSize model =
+    let
+        divisor =
+            if model.device.orientation == Landscape then
+                30
+
+            else
+                15
+    in
+    round (toFloat model.screenSize.windowWidth / divisor)
 
 
-subcaptionView : Element msg
-subcaptionView =
-    el [ Font.size (round (scaled 1)) ] (text mtCaption)
+subheaderFontSize : Model -> Int
+subheaderFontSize model =
+    round (toFloat (headerFontSize model) / 2)
 
 
-textView : Element msg
-textView =
+nameView : Model -> Element msg
+nameView model =
+    el [ Font.size <| headerFontSize model, Font.bold ] (text mtName)
+
+
+subcaptionView : Model -> Element msg
+subcaptionView model =
+    el [ Font.size <| subheaderFontSize model ] (text mtCaption)
+
+
+textView : Model -> Element msg
+textView model =
+    let
+        verticalPadding =
+            toFloat model.screenSize.windowHeight / 10 |> round
+
+        horizontalPadding =
+            toFloat model.screenSize.windowWidth / 7 |> round
+    in
     column
         [ alignBottom
-        , paddingXY 500 50
+        , paddingXY horizontalPadding verticalPadding
         , spacing 3
         ]
-        [ nameView, subcaptionView ]
+        [ nameView model, subcaptionView model ]
 
 
 linksView : Model -> Element Msg
@@ -255,7 +274,7 @@ wrapperView model =
         , width fill
         ]
         [ linksView model
-        , textView
+        , textView model
         ]
 
 

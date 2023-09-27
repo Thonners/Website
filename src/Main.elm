@@ -12,9 +12,10 @@ import Element.Events
 import Element.Font as Font
 import Home
 import Html exposing (Html)
+import Responsive exposing (ScreenSize)
 import Route exposing (Route(..))
 import Time
-import Tuesday exposing (ScreenSize)
+import Tuesday
 import Url exposing (Url)
 
 
@@ -73,7 +74,7 @@ initCurrentPage ( model, existingCmds ) =
                 Route.Home ->
                     let
                         ( pageModel, pageCmds ) =
-                            Home.init ()
+                            Home.init model.device model.screenSize
                     in
                     ( HomePage pageModel, Cmd.map HomePageMsg pageCmds )
 

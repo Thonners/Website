@@ -2,15 +2,11 @@ module Tuesday exposing (..)
 
 import Animator
 import Animator.Inline
-import Browser
-import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
-import Element.Border as Border
-import Element.Events
 import Element.Font as Font
-import Element.Input as Input
 import Html exposing (Html)
+import Responsive exposing (ScreenSize)
 import Time
 
 
@@ -79,10 +75,6 @@ type alias Id =
 
 type Msg
     = RuntimeTriggeredAnimationStep Time.Posix
-
-
-type alias ScreenSize =
-    { windowWidth : Int, windowHeight : Int }
 
 
 type alias Model =
