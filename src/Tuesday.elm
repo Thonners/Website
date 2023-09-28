@@ -54,7 +54,7 @@ tuesday =
     [ LetterDetails "T" "rain" (rgb255 255 0 0) (FadeInLetter 1) (FadeInWord 1)
     , LetterDetails "U" "ntil" (rgb255 220 100 23) (FadeInLetter 2) (FadeInWord 2)
     , LetterDetails "E" "very" (rgb255 255 255 0) (FadeInLetter 3) (FadeInWord 3)
-    , LetterDetails "S" "inue" (rgb255 0 255 0) (FadeInLetter 4) (FadeInWord 4)
+    , LetterDetails "S" "inew" (rgb255 0 255 0) (FadeInLetter 4) (FadeInWord 4)
     , LetterDetails "D" "evelops" (rgb255 0 0 255) (FadeInLetter 5) (FadeInWord 5)
     , LetterDetails "A" "nd" (rgb255 75 0 130) (FadeInLetter 6) (FadeInWord 6)
     , LetterDetails "Y" "ields" (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 7)

@@ -15659,7 +15659,7 @@ var $author$project$Tuesday$tuesday = _List_fromArray(
 		A5(
 		$author$project$Tuesday$LetterDetails,
 		'S',
-		'inue',
+		'inew',
 		A3($mdgriffith$elm_ui$Element$rgb255, 0, 255, 0),
 		$author$project$Tuesday$FadeInLetter(4),
 		$author$project$Tuesday$FadeInWord(4)),
