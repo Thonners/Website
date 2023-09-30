@@ -223,6 +223,7 @@ view model =
         , width fill
         , Background.color <| rgb255 0 0 0
         , Font.color <| rgb255 255 255 255
+        , clipY
         ]
         (tuesdayLayout model)
 

@@ -15290,6 +15290,8 @@ var $author$project$Home$view = function (model) {
 			]),
 		$author$project$Home$wrapperView(model));
 };
+var $mdgriffith$elm_ui$Internal$Flag$overflow = $mdgriffith$elm_ui$Internal$Flag$flag(20);
+var $mdgriffith$elm_ui$Element$clipY = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$overflow, $mdgriffith$elm_ui$Internal$Style$classes.clipY);
 var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -15788,7 +15790,8 @@ var $author$project$Tuesday$view = function (model) {
 				$mdgriffith$elm_ui$Element$Background$color(
 				A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 0)),
 				$mdgriffith$elm_ui$Element$Font$color(
-				A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 255))
+				A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 255)),
+				$mdgriffith$elm_ui$Element$clipY
 			]),
 		$author$project$Tuesday$tuesdayLayout(model));
 };
