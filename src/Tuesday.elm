@@ -20,6 +20,11 @@ fadeInDelayWord =
     0.7
 
 
+fadeOutDelayWord : Float
+fadeOutDelayWord =
+    1.0
+
+
 padding : Int
 padding =
     50
@@ -42,30 +47,37 @@ fontSizeAspectRatio =
 
 type alias LetterDetails =
     { letter : String
-    , restOfWord : String
+    , restOfWords : List String
     , colour : Color
     , targetLetterFadeInState : AnimationState
     , targetWordFadeInState : AnimationState
     }
 
 
-tuesday : List LetterDetails
-tuesday =
-    [ LetterDetails "T" "rain" (rgb255 255 0 0) (FadeInLetter 1) (FadeInWord 1)
-    , LetterDetails "U" "ntil" (rgb255 220 100 23) (FadeInLetter 2) (FadeInWord 2)
-    , LetterDetails "E" "very" (rgb255 255 255 0) (FadeInLetter 3) (FadeInWord 3)
-    , LetterDetails "S" "inew" (rgb255 0 255 0) (FadeInLetter 4) (FadeInWord 4)
-    , LetterDetails "D" "evelops" (rgb255 0 0 255) (FadeInLetter 5) (FadeInWord 5)
-    , LetterDetails "A" "nd" (rgb255 75 0 130) (FadeInLetter 6) (FadeInWord 6)
-    , LetterDetails "Y" "ields" (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 7)
+tuesdays : List LetterDetails
+tuesdays =
+    [ LetterDetails "T" [ "UESDAYS", "rain", "onight", "o", "hrough" ] (rgb255 255 0 0) (FadeInLetter 1) (FadeInWord 0 0)
+    , LetterDetails "U" [ "plifts", "ntil", "ltra", "s", "ltimate" ] (rgb255 220 100 23) (FadeInLetter 2) (FadeInWord 0 1)
+    , LetterDetails "E" [ "veryone", "very", "lderly", "very", "ffort" ] (rgb255 255 255 0) (FadeInLetter 3) (FadeInWord 0 2)
+    , LetterDetails "S" [ "timulating", "inew", "oldiers", "ession", "enescent" ] (rgb255 0 255 0) (FadeInLetter 4) (FadeInWord 0 3)
+    , LetterDetails "D" [ "evelopment", "evelops", "ominate", "emands", "udes" ] (rgb255 0 0 255) (FadeInLetter 5) (FadeInWord 0 4)
+    , LetterDetails "A" [ "nd", "nd", "thleticism;", "ll", "chieve" ] (rgb255 75 0 130) (FadeInLetter 6) (FadeInWord 0 5)
+    , LetterDetails "Y" [ "outhful", "ields", "ouths", "our", "outhful" ] (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 0 6)
+    , LetterDetails "S" [ "pirit", "atisfaction", "truggle", "pirit", "tate" ] (rgb255 127 0 255) (FadeInLetter 8) (FadeInWord 0 7)
     ]
+
+
+tuesdaysLength : Int
+tuesdaysLength =
+    List.length tuesdays
 
 
 type AnimationState
     = NotStarted
     | FadeInLetter Int
     | SlideLeft
-    | FadeInWord Int
+    | FadeInWord Int Int
+    | FadeOut Int
     | WordsDisplayed
 
 
@@ -84,29 +96,46 @@ type alias Model =
     }
 
 
+wordRevealAnimationStates : Int -> List (Animator.Step AnimationState)
+wordRevealAnimationStates currentIndex =
+    [ Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 0)
+    , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 1)
+    , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 2)
+    , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 3)
+    , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 4)
+    , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 5)
+    , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 6)
+    , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord currentIndex 7)
+    , Animator.wait (Animator.seconds 0.2)
+    , Animator.event (Animator.seconds fadeOutDelayWord) (FadeOut currentIndex)
+    , Animator.wait (Animator.seconds 0.2)
+    ]
+
+
 init : Device -> ScreenSize -> ( Model, Cmd Msg )
 init device screenSize =
     let
         fadeInQueue =
             Animator.queue
-                [ Animator.wait (Animator.seconds 1)
-                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 1)
-                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 2)
-                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 3)
-                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 4)
-                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
-                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
-                , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
-                , Animator.event (Animator.seconds 1.5) SlideLeft
-                , Animator.wait (Animator.seconds 0.2)
-                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 1)
-                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 2)
-                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 3)
-                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 4)
-                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 5)
-                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 6)
-                , Animator.event (Animator.seconds fadeInDelayWord) (FadeInWord 7)
-                ]
+                ([ Animator.wait (Animator.seconds 1)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 0)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 1)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 2)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 3)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 4)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
+                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
+                 , Animator.event (Animator.seconds 1.5) SlideLeft
+                 , Animator.wait (Animator.seconds 0.2)
+                 ]
+                    ++ wordRevealAnimationStates 0
+                    ++ wordRevealAnimationStates 1
+                    ++ wordRevealAnimationStates 2
+                    ++ wordRevealAnimationStates 3
+                    ++ wordRevealAnimationStates 4
+                    ++ wordRevealAnimationStates 5
+                )
     in
     ( { device = device
       , screenSize = screenSize
@@ -139,11 +168,6 @@ animator =
             )
 
 
-updateAnimationState : Model -> AnimationState -> Time.Posix -> Model
-updateAnimationState model nextState time =
-    { model | animationState = Animator.go (Animator.seconds 5) nextState model.animationState } |> Animator.update time animator
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -172,14 +196,14 @@ horizontallyDeterminedFontSize : Model -> Int
 horizontallyDeterminedFontSize model =
     let
         targetWidth =
-            toFloat (windowWidthWithoutPadding model - 6 * letterSpacing) / 7
+            toFloat (windowWidthWithoutPadding model - (tuesdaysLength - 1) * letterSpacing) / toFloat tuesdaysLength
     in
     round <| targetWidth / fontSizeAspectRatio
 
 
 verticallyDeterminedFontSize : Model -> Int
 verticallyDeterminedFontSize model =
-    floor <| toFloat (model.screenSize.windowHeight - 2 * padding - 6 * verticalSpacing) / 7
+    floor <| toFloat (model.screenSize.windowHeight - 2 * padding - (tuesdaysLength - 1) * verticalSpacing) / toFloat tuesdaysLength
 
 
 fontSize : Model -> Int
@@ -218,13 +242,13 @@ tuesdayLayout model =
         , Element.spacing verticalSpacing
         , Element.padding padding
         ]
-        (tuesday
+        (tuesdays
             |> List.indexedMap (letterElement model)
         )
 
 
 letterElement : Model -> Int -> LetterDetails -> Element Msg
-letterElement model letterIndex { letter, restOfWord, colour, targetLetterFadeInState, targetWordFadeInState } =
+letterElement model letterIndex { letter, restOfWords, colour, targetLetterFadeInState, targetWordFadeInState } =
     el
         [ Font.color colour
         , Font.size <| fontSize model
@@ -235,9 +259,19 @@ letterElement model letterIndex { letter, restOfWord, colour, targetLetterFadeIn
         , moveUp <| upMoveAmount model letterIndex
         ]
         (row []
-            [ el [ letterFadeInAnimation model targetLetterFadeInState ] <| text letter
-            , el [ wordFadeInAnimation model targetWordFadeInState, wordAppearAnimation model ] <| text restOfWord
-            ]
+            ((el [ letterFadeInAnimation model targetLetterFadeInState ] <| text letter)
+                :: List.indexedMap
+                    (\i restOfWord ->
+                        el
+                            [ wordFadeInAnimation model targetWordFadeInState i
+                            , wordAppearAnimation model targetWordFadeInState i
+                            , moveUp <| wordFadeOutAnimation model i
+                            ]
+                        <|
+                            text restOfWord
+                    )
+                    restOfWords
+            )
         )
 
 
@@ -253,7 +287,7 @@ upMoveAmount model letterIndex =
                 (-1.5 + toFloat letterIndex) * toFloat (fontSize model + verticalSpacing)
 
             else
-                (windowHeightWithoutPadding / 7 * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
+                (windowHeightWithoutPadding / toFloat tuesdaysLength * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
 
         preMovement =
             Animator.at <| verticalOffset
@@ -290,7 +324,7 @@ rightMoveAmount model letterIndex =
                 0
 
             else
-                toFloat (model.screenSize.windowWidth - 7 * horizontalFontSizePlusSpacing) / 2
+                toFloat (model.screenSize.windowWidth - tuesdaysLength * horizontalFontSizePlusSpacing) / 2
 
         preMovement =
             Animator.at <| toFloat (horizontalFontSizePlusSpacing * letterIndex) + leftOffset
@@ -343,49 +377,67 @@ letterFadeInAnimation model targetAnimationState =
             )
 
 
-wordFadeInAnimation : Model -> AnimationState -> Attribute Msg
-wordFadeInAnimation model targetAnimationState =
-    -- TODO set display: none before we start the animations so they don't cause scrollbars
+wordFadeInAnimation : Model -> AnimationState -> Int -> Attribute Msg
+wordFadeInAnimation model targetAnimationState targetWordInListIndex =
     let
-        animationComplete =
-            case Animator.current model.animationState of
-                FadeInWord currentI ->
+        fadeIn state =
+            case state of
+                FadeInWord wordIndex currentRow ->
                     case targetAnimationState of
-                        FadeInWord targetI ->
-                            currentI > targetI
+                        FadeInWord _ targetRow ->
+                            if wordIndex == targetWordInListIndex && currentRow >= targetRow then
+                                Animator.at 1
+
+                            else
+                                Animator.at 0
 
                         _ ->
-                            False
+                            Animator.at 0
 
                 NotStarted ->
-                    False
+                    Animator.at 0
 
                 FadeInLetter _ ->
-                    False
+                    Animator.at 0
 
                 SlideLeft ->
-                    False
+                    Animator.at 0
+
+                FadeOut _ ->
+                    Animator.at 0
 
                 WordsDisplayed ->
-                    True
+                    Animator.at 1
     in
     htmlAttribute <|
-        Animator.Inline.opacity model.animationState
-            (\state ->
-                if state == targetAnimationState || animationComplete then
-                    Animator.at 1 |> Animator.leaveSmoothly 0.8
+        Animator.Inline.opacity model.animationState fadeIn
 
-                else
+
+wordFadeOutAnimation : Model -> Int -> Float
+wordFadeOutAnimation model wordIndex =
+    let
+        fadeOut state =
+            case state of
+                FadeOut indexToFade ->
+                    if wordIndex == indexToFade then
+                        toFloat -100
+                            |> Animator.at
+                            |> Animator.leaveSmoothly 1
+
+                    else
+                        Animator.at 0
+
+                _ ->
                     Animator.at 0
-            )
+    in
+    Animator.move model.animationState fadeOut
 
 
-wordAppearAnimation : Model -> Attribute Msg
-wordAppearAnimation model =
+wordAppearAnimation : Model -> AnimationState -> Int -> Attribute Msg
+wordAppearAnimation model targetAnimationState targetWordNumber =
     let
         showWord state =
             case state of
-                -- case Animator.current model.animationState of
                 NotStarted ->
                     Animator.at 0
 
@@ -395,8 +447,24 @@ wordAppearAnimation model =
                 SlideLeft ->
                     Animator.at 0
 
-                FadeInWord _ ->
-                    Animator.at 1
+                FadeInWord wordIndex _ ->
+                    case targetAnimationState of
+                        FadeInWord _ _ ->
+                            if wordIndex == targetWordNumber then
+                                Animator.at 1
+
+                            else
+                                Animator.at 0
+
+                        _ ->
+                            Animator.at 0
+
+                FadeOut currentIndex ->
+                    if currentIndex == targetWordNumber then
+                        Animator.at 0
+
+                    else
+                        Animator.at 0
 
                 WordsDisplayed ->
                     Animator.at 1
