@@ -20,6 +20,11 @@ fadeInDelayWord =
     0.7
 
 
+burpeeDelay : Float
+burpeeDelay =
+    0.5
+
+
 fadeOutDelayWord : Float
 fadeOutDelayWord =
     1.0
@@ -56,14 +61,14 @@ type alias LetterDetails =
 
 tuesdays : List LetterDetails
 tuesdays =
-    [ LetterDetails "T" [ "UESDAYS", "rain", "onight", "o", "hrough" ] (rgb255 255 0 0) (FadeInLetter 1) (FadeInWord 0 0)
-    , LetterDetails "U" [ "plifts", "ntil", "ltra", "s", "ltimate" ] (rgb255 220 100 23) (FadeInLetter 2) (FadeInWord 0 1)
-    , LetterDetails "E" [ "veryone", "very", "lderly", "very", "ffort" ] (rgb255 255 255 0) (FadeInLetter 3) (FadeInWord 0 2)
-    , LetterDetails "S" [ "timulating", "inew", "oldiers", "ession", "enescent" ] (rgb255 0 255 0) (FadeInLetter 4) (FadeInWord 0 3)
-    , LetterDetails "D" [ "evelopment", "evelops", "ominate", "emands", "udes" ] (rgb255 0 0 255) (FadeInLetter 5) (FadeInWord 0 4)
-    , LetterDetails "A" [ "nd", "nd", "thleticism;", "ll", "chieve" ] (rgb255 75 0 130) (FadeInLetter 6) (FadeInWord 0 5)
-    , LetterDetails "Y" [ "outhful", "ields", "ouths", "our", "outhful" ] (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 0 6)
-    , LetterDetails "S" [ "pirit", "atisfaction", "truggle", "pirit", "tate" ] (rgb255 127 0 255) (FadeInLetter 8) (FadeInWord 0 7)
+    [ LetterDetails "T" [ "UESDAYS", "rain", "onight", "o", "hrough" ] (rgb255 255 0 0) (FadeInLetter 0) (FadeInWord 0 0)
+    , LetterDetails "U" [ "plifts", "ntil", "ltra", "s", "ltimate" ] (rgb255 220 100 23) (FadeInLetter 1) (FadeInWord 0 1)
+    , LetterDetails "E" [ "veryone", "very", "lderly", "very", "ffort" ] (rgb255 255 255 0) (FadeInLetter 2) (FadeInWord 0 2)
+    , LetterDetails "S" [ "timulating", "inew", "oldiers", "ession", "enescent" ] (rgb255 0 255 0) (FadeInLetter 3) (FadeInWord 0 3)
+    , LetterDetails "D" [ "evelopment", "evelops", "ominate", "emands", "udes" ] (rgb255 0 0 255) (FadeInLetter 4) (FadeInWord 0 4)
+    , LetterDetails "A" [ "nd", "nd", "thleticism;", "ll", "chieve" ] (rgb255 75 0 130) (FadeInLetter 5) (FadeInWord 0 5)
+    , LetterDetails "Y" [ "outhful", "ields", "ouths", "our", "outhful" ] (rgb255 127 0 255) (FadeInLetter 6) (FadeInWord 0 6)
+    , LetterDetails "S" [ "pirit", "atisfaction", "truggle", "pirit", "tate" ] (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 0 7)
     ]
 
 
@@ -77,8 +82,16 @@ type AnimationState
     | FadeInLetter Int
     | SlideLeft
     | FadeInWord Int Int
+    | Burpee BurpeeState
     | FadeOut Int
     | WordsDisplayed
+
+
+type BurpeeState
+    = Standing
+    | Folding
+    | Prone
+    | Jumping
 
 
 type alias Id =
@@ -94,6 +107,18 @@ type alias Model =
     , screenSize : ScreenSize
     , animationState : Animator.Timeline AnimationState
     }
+
+
+burpeeStates : List (Animator.Step AnimationState)
+burpeeStates =
+    [ Animator.event (Animator.seconds burpeeDelay) (Burpee Standing)
+    , Animator.event (Animator.seconds burpeeDelay) (Burpee Folding)
+    , Animator.event (Animator.seconds burpeeDelay) (Burpee Prone)
+    , Animator.event (Animator.seconds burpeeDelay) (Burpee Folding)
+    , Animator.event (Animator.seconds burpeeDelay) (Burpee Standing)
+    , Animator.event (Animator.seconds burpeeDelay) (Burpee Jumping)
+    , Animator.event (Animator.seconds burpeeDelay) (Burpee Standing)
+    ]
 
 
 wordRevealAnimationStates : Int -> List (Animator.Step AnimationState)
@@ -126,6 +151,7 @@ init device screenSize =
                  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
                  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
                  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
+                 , Animator.wait (Animator.seconds 0.2)
                  , Animator.event (Animator.seconds 1.5) SlideLeft
                  , Animator.wait (Animator.seconds 0.2)
                  ]
@@ -404,6 +430,9 @@ wordFadeInAnimation model targetAnimationState targetWordInListIndex =
                 SlideLeft ->
                     Animator.at 0
 
+                Burpee _ ->
+                    Animator.at 0
+
                 FadeOut _ ->
                     Animator.at 0
 
@@ -459,6 +488,9 @@ wordAppearAnimation model targetAnimationState targetWordNumber =
 
                         _ ->
                             Animator.at 0
+
+                Burpee _ ->
+                    Animator.at 0
 
                 FadeOut currentIndex ->
                     if currentIndex == targetWordNumber then

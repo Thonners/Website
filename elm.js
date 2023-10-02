@@ -5735,6 +5735,8 @@ var $author$project$Tuesday$init = F2(
 						$mdgriffith$elm_animator$Animator$event,
 						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
 						$author$project$Tuesday$FadeInLetter(7)),
+						$mdgriffith$elm_animator$Animator$wait(
+						$mdgriffith$elm_animator$Animator$seconds(0.2)),
 						A2(
 						$mdgriffith$elm_animator$Animator$event,
 						$mdgriffith$elm_animator$Animator$seconds(1.5),
@@ -15318,7 +15320,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['UESDAYS', 'rain', 'onight', 'o', 'hrough']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 255, 0, 0),
-		$author$project$Tuesday$FadeInLetter(1),
+		$author$project$Tuesday$FadeInLetter(0),
 		A2($author$project$Tuesday$FadeInWord, 0, 0)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15326,7 +15328,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['plifts', 'ntil', 'ltra', 's', 'ltimate']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 220, 100, 23),
-		$author$project$Tuesday$FadeInLetter(2),
+		$author$project$Tuesday$FadeInLetter(1),
 		A2($author$project$Tuesday$FadeInWord, 0, 1)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15334,7 +15336,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['veryone', 'very', 'lderly', 'very', 'ffort']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 0),
-		$author$project$Tuesday$FadeInLetter(3),
+		$author$project$Tuesday$FadeInLetter(2),
 		A2($author$project$Tuesday$FadeInWord, 0, 2)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15342,7 +15344,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['timulating', 'inew', 'oldiers', 'ession', 'enescent']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 0, 255, 0),
-		$author$project$Tuesday$FadeInLetter(4),
+		$author$project$Tuesday$FadeInLetter(3),
 		A2($author$project$Tuesday$FadeInWord, 0, 3)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15350,7 +15352,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['evelopment', 'evelops', 'ominate', 'emands', 'udes']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 255),
-		$author$project$Tuesday$FadeInLetter(5),
+		$author$project$Tuesday$FadeInLetter(4),
 		A2($author$project$Tuesday$FadeInWord, 0, 4)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15358,7 +15360,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['nd', 'nd', 'thleticism;', 'll', 'chieve']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 75, 0, 130),
-		$author$project$Tuesday$FadeInLetter(6),
+		$author$project$Tuesday$FadeInLetter(5),
 		A2($author$project$Tuesday$FadeInWord, 0, 5)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15366,7 +15368,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['outhful', 'ields', 'ouths', 'our', 'outhful']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255),
-		$author$project$Tuesday$FadeInLetter(7),
+		$author$project$Tuesday$FadeInLetter(6),
 		A2($author$project$Tuesday$FadeInWord, 0, 6)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15374,7 +15376,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['pirit', 'atisfaction', 'truggle', 'pirit', 'tate']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255),
-		$author$project$Tuesday$FadeInLetter(8),
+		$author$project$Tuesday$FadeInLetter(7),
 		A2($author$project$Tuesday$FadeInWord, 0, 7))
 	]);
 var $author$project$Tuesday$tuesdaysLength = $elm$core$List$length($author$project$Tuesday$tuesdays);
@@ -15590,6 +15592,8 @@ var $author$project$Tuesday$wordAppearAnimation = F3(
 					} else {
 						return $mdgriffith$elm_animator$Animator$at(0);
 					}
+				case 'Burpee':
+					return $mdgriffith$elm_animator$Animator$at(0);
 				case 'FadeOut':
 					var currentIndex = state.a;
 					return _Utils_eq(currentIndex, targetWordNumber) ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(0);
@@ -15618,6 +15622,8 @@ var $author$project$Tuesday$wordFadeInAnimation = F3(
 				case 'FadeInLetter':
 					return $mdgriffith$elm_animator$Animator$at(0);
 				case 'SlideLeft':
+					return $mdgriffith$elm_animator$Animator$at(0);
+				case 'Burpee':
 					return $mdgriffith$elm_animator$Animator$at(0);
 				case 'FadeOut':
 					return $mdgriffith$elm_animator$Animator$at(0);
