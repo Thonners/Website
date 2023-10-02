@@ -5438,16 +5438,72 @@ var $author$project$Home$init = F2(
 			},
 			$elm$core$Platform$Cmd$none);
 	});
+var $author$project$Tuesday$NotStarted = {$: 'NotStarted'};
 var $author$project$Tuesday$FadeInLetter = function (a) {
 	return {$: 'FadeInLetter', a: a};
 };
-var $author$project$Tuesday$NotStarted = {$: 'NotStarted'};
-var $author$project$Tuesday$SlideLeft = {$: 'SlideLeft'};
+var $author$project$Tuesday$Burpee = function (a) {
+	return {$: 'Burpee', a: a};
+};
+var $author$project$Tuesday$Folding = {$: 'Folding'};
+var $author$project$Tuesday$Jumping = {$: 'Jumping'};
+var $author$project$Tuesday$Prone = {$: 'Prone'};
+var $author$project$Tuesday$Standing = {$: 'Standing'};
+var $author$project$Tuesday$burpeeDelay = 1.0;
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
 	});
 var $mdgriffith$elm_animator$Animator$event = $mdgriffith$elm_animator$Animator$TransitionTo;
+var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
+};
+var $mdgriffith$elm_animator$Animator$seconds = $ianmackenzie$elm_units$Duration$seconds;
+var $mdgriffith$elm_animator$Animator$Wait = function (a) {
+	return {$: 'Wait', a: a};
+};
+var $mdgriffith$elm_animator$Animator$wait = $mdgriffith$elm_animator$Animator$Wait;
+var $author$project$Tuesday$burpeeStates = _List_fromArray(
+	[
+		A2(
+		$mdgriffith$elm_animator$Animator$event,
+		$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$burpeeDelay),
+		$author$project$Tuesday$Burpee($author$project$Tuesday$Standing)),
+		$mdgriffith$elm_animator$Animator$wait(
+		$mdgriffith$elm_animator$Animator$seconds(0.2)),
+		A2(
+		$mdgriffith$elm_animator$Animator$event,
+		$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$burpeeDelay),
+		$author$project$Tuesday$Burpee($author$project$Tuesday$Folding)),
+		$mdgriffith$elm_animator$Animator$wait(
+		$mdgriffith$elm_animator$Animator$seconds(0.2)),
+		A2(
+		$mdgriffith$elm_animator$Animator$event,
+		$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$burpeeDelay),
+		$author$project$Tuesday$Burpee($author$project$Tuesday$Prone)),
+		$mdgriffith$elm_animator$Animator$wait(
+		$mdgriffith$elm_animator$Animator$seconds(0.2)),
+		A2(
+		$mdgriffith$elm_animator$Animator$event,
+		$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$burpeeDelay),
+		$author$project$Tuesday$Burpee($author$project$Tuesday$Folding)),
+		$mdgriffith$elm_animator$Animator$wait(
+		$mdgriffith$elm_animator$Animator$seconds(0.2)),
+		A2(
+		$mdgriffith$elm_animator$Animator$event,
+		$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$burpeeDelay),
+		$author$project$Tuesday$Burpee($author$project$Tuesday$Standing)),
+		A2(
+		$mdgriffith$elm_animator$Animator$event,
+		$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$burpeeDelay),
+		$author$project$Tuesday$Burpee($author$project$Tuesday$Jumping)),
+		A2(
+		$mdgriffith$elm_animator$Animator$event,
+		$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$burpeeDelay),
+		$author$project$Tuesday$Burpee($author$project$Tuesday$Standing)),
+		$mdgriffith$elm_animator$Animator$wait(
+		$mdgriffith$elm_animator$Animator$seconds(0.2))
+	]);
 var $author$project$Tuesday$fadeInDelayLetter = 0.5;
 var $mdgriffith$elm_animator$Internal$Timeline$Event = F3(
 	function (a, b, c) {
@@ -5495,9 +5551,6 @@ var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
 			}
 		}
 	});
-var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
-	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
-};
 var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
 	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
 };
@@ -5636,11 +5689,6 @@ var $mdgriffith$elm_animator$Animator$queue = F2(
 					running: true
 				}));
 	});
-var $mdgriffith$elm_animator$Animator$seconds = $ianmackenzie$elm_units$Duration$seconds;
-var $mdgriffith$elm_animator$Animator$Wait = function (a) {
-	return {$: 'Wait', a: a};
-};
-var $mdgriffith$elm_animator$Animator$wait = $mdgriffith$elm_animator$Animator$Wait;
 var $author$project$Tuesday$FadeInWord = F2(
 	function (a, b) {
 		return {$: 'FadeInWord', a: a, b: b};
@@ -5695,69 +5743,67 @@ var $author$project$Tuesday$wordRevealAnimationStates = function (currentIndex) 
 			$mdgriffith$elm_animator$Animator$seconds(0.2))
 		]);
 };
+var $author$project$Tuesday$animationQuene = $mdgriffith$elm_animator$Animator$queue(
+	_Utils_ap(
+		_List_fromArray(
+			[
+				$mdgriffith$elm_animator$Animator$wait(
+				$mdgriffith$elm_animator$Animator$seconds(1)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(0)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(1)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(2)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(3)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(4)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(5)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(6)),
+				A2(
+				$mdgriffith$elm_animator$Animator$event,
+				$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
+				$author$project$Tuesday$FadeInLetter(7)),
+				$mdgriffith$elm_animator$Animator$wait(
+				$mdgriffith$elm_animator$Animator$seconds(0.2))
+			]),
+		_Utils_ap(
+			$author$project$Tuesday$burpeeStates,
+			_Utils_ap(
+				$author$project$Tuesday$wordRevealAnimationStates(0),
+				_Utils_ap(
+					$author$project$Tuesday$wordRevealAnimationStates(1),
+					_Utils_ap(
+						$author$project$Tuesday$wordRevealAnimationStates(2),
+						_Utils_ap(
+							$author$project$Tuesday$wordRevealAnimationStates(3),
+							_Utils_ap(
+								$author$project$Tuesday$wordRevealAnimationStates(4),
+								_Utils_ap(
+									$author$project$Tuesday$wordRevealAnimationStates(5),
+									$author$project$Tuesday$burpeeStates)))))))));
 var $author$project$Tuesday$init = F2(
 	function (device, screenSize) {
-		var fadeInQueue = $mdgriffith$elm_animator$Animator$queue(
-			_Utils_ap(
-				_List_fromArray(
-					[
-						$mdgriffith$elm_animator$Animator$wait(
-						$mdgriffith$elm_animator$Animator$seconds(1)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(0)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(1)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(2)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(3)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(4)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(5)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(6)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds($author$project$Tuesday$fadeInDelayLetter),
-						$author$project$Tuesday$FadeInLetter(7)),
-						$mdgriffith$elm_animator$Animator$wait(
-						$mdgriffith$elm_animator$Animator$seconds(0.2)),
-						A2(
-						$mdgriffith$elm_animator$Animator$event,
-						$mdgriffith$elm_animator$Animator$seconds(1.5),
-						$author$project$Tuesday$SlideLeft),
-						$mdgriffith$elm_animator$Animator$wait(
-						$mdgriffith$elm_animator$Animator$seconds(0.2))
-					]),
-				_Utils_ap(
-					$author$project$Tuesday$wordRevealAnimationStates(0),
-					_Utils_ap(
-						$author$project$Tuesday$wordRevealAnimationStates(1),
-						_Utils_ap(
-							$author$project$Tuesday$wordRevealAnimationStates(2),
-							_Utils_ap(
-								$author$project$Tuesday$wordRevealAnimationStates(3),
-								_Utils_ap(
-									$author$project$Tuesday$wordRevealAnimationStates(4),
-									$author$project$Tuesday$wordRevealAnimationStates(5))))))));
 		return _Utils_Tuple2(
 			{
-				animationState: fadeInQueue(
+				animationState: $author$project$Tuesday$animationQuene(
 					$mdgriffith$elm_animator$Animator$init($author$project$Tuesday$NotStarted)),
 				device: device,
 				screenSize: screenSize
@@ -15486,11 +15532,99 @@ var $mdgriffith$elm_ui$Element$moveUp = function (y) {
 		$mdgriffith$elm_ui$Internal$Model$MoveY(-y));
 };
 var $author$project$Tuesday$WordsDisplayed = {$: 'WordsDisplayed'};
+var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
+	return {$: 'Specified', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
+	function (a, b, c) {
+		return {$: 'Oscillate', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
+	return {$: 'PartialDefault', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
+var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
+var $mdgriffith$elm_animator$Animator$withDefault = F2(
+	function (toDef, currentDefault) {
+		if (currentDefault.$ === 'FullDefault') {
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
+		} else {
+			var thing = currentDefault.a;
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef(thing));
+		}
+	});
+var $mdgriffith$elm_animator$Animator$applyOption = F2(
+	function (toOption, movement) {
+		if (movement.$ === 'Position') {
+			var personality = movement.a;
+			var pos = movement.b;
+			return A2(
+				$mdgriffith$elm_animator$Internal$Interpolate$Position,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				pos);
+		} else {
+			var personality = movement.a;
+			var dur = movement.b;
+			var fn = movement.c;
+			return A3(
+				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				dur,
+				fn);
+		}
+	});
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
+var $author$project$Tuesday$burpeeHorizontalPositioning = F3(
+	function (phaseOfBurpee, letterIndex, fontWidth) {
+		switch (phaseOfBurpee.$) {
+			case 'Standing':
+				return 0;
+			case 'Folding':
+				return 0.2 * (fontWidth * letterIndex);
+			case 'Prone':
+				return fontWidth * letterIndex;
+			default:
+				return 0;
+		}
+	});
 var $author$project$Tuesday$fontSizeSetByHorizontalConstraint = function (model) {
 	return _Utils_cmp(
 		$author$project$Tuesday$horizontallyDeterminedFontSize(model),
 		$author$project$Tuesday$verticallyDeterminedFontSize(model)) < 0;
 };
+var $mdgriffith$elm_animator$Animator$leaveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
 var $author$project$Tuesday$rightMoveAmount = F2(
 	function (model, letterIndex) {
 		var fontWidth = $elm$core$Basics$round(
@@ -15509,6 +15643,16 @@ var $author$project$Tuesday$rightMoveAmount = F2(
 						return preMovement;
 					case 'FadeInLetter':
 						return preMovement;
+					case 'Burpee':
+						var phaseOfBurpee = animationState.a;
+						return A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							0.2,
+							A2(
+								$mdgriffith$elm_animator$Animator$leaveSmoothly,
+								1,
+								$mdgriffith$elm_animator$Animator$at(
+									A3($author$project$Tuesday$burpeeHorizontalPositioning, phaseOfBurpee, letterIndex, fontWidth))));
 					default:
 						return $mdgriffith$elm_animator$Animator$at(0);
 				}
@@ -15551,11 +15695,26 @@ var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family
 			$mdgriffith$elm_ui$Element$Font$typeface('Virgil'),
 			$mdgriffith$elm_ui$Element$Font$sansSerif
 		]));
+var $author$project$Tuesday$burpeeVerticalPositioning = F5(
+	function (phaseOfBurpee, letterIndex, fontsize, windowHeightWithoutPadding, verticalOffsetForCentring) {
+		var bottomOfScreen = verticalOffsetForCentring - (windowHeightWithoutPadding / 2);
+		switch (phaseOfBurpee.$) {
+			case 'Standing':
+				return 0;
+			case 'Folding':
+				return (letterIndex < 4) ? (bottomOfScreen + (letterIndex * fontsize)) : (bottomOfScreen + (($author$project$Tuesday$tuesdaysLength - letterIndex) * fontsize));
+			case 'Prone':
+				return bottomOfScreen;
+			default:
+				return 20;
+		}
+	});
 var $author$project$Tuesday$upMoveAmount = F2(
 	function (model, letterIndex) {
 		var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
-		var verticalOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? (((-1.5) + letterIndex) * ($author$project$Tuesday$fontSize(model) + $author$project$Tuesday$verticalSpacing)) : (((windowHeightWithoutPadding / $author$project$Tuesday$tuesdaysLength) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
-		var preMovement = $mdgriffith$elm_animator$Animator$at(verticalOffset);
+		var verticalOffsetForCentring = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? (((-1.5) + letterIndex) * ($author$project$Tuesday$fontSize(model) + $author$project$Tuesday$verticalSpacing)) : (((windowHeightWithoutPadding / $author$project$Tuesday$tuesdaysLength) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
+		var centred = $mdgriffith$elm_animator$Animator$at(verticalOffsetForCentring);
+		var bottomOfScreen = $mdgriffith$elm_animator$Animator$at(verticalOffsetForCentring - (windowHeightWithoutPadding / 2));
 		return _Utils_eq(
 			$mdgriffith$elm_animator$Animator$current(model.animationState),
 			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
@@ -15564,9 +15723,25 @@ var $author$project$Tuesday$upMoveAmount = F2(
 			function (animationState) {
 				switch (animationState.$) {
 					case 'NotStarted':
-						return preMovement;
+						return centred;
 					case 'FadeInLetter':
-						return preMovement;
+						return centred;
+					case 'Burpee':
+						var phaseOfBurpee = animationState.a;
+						return A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							0.2,
+							A2(
+								$mdgriffith$elm_animator$Animator$leaveSmoothly,
+								1,
+								$mdgriffith$elm_animator$Animator$at(
+									A5(
+										$author$project$Tuesday$burpeeVerticalPositioning,
+										phaseOfBurpee,
+										letterIndex,
+										$author$project$Tuesday$fontSize(model),
+										windowHeightWithoutPadding,
+										verticalOffsetForCentring))));
 					default:
 						return $mdgriffith$elm_animator$Animator$at(0);
 				}
@@ -15633,67 +15808,6 @@ var $author$project$Tuesday$wordFadeInAnimation = F3(
 		};
 		return $mdgriffith$elm_ui$Element$htmlAttribute(
 			A2($mdgriffith$elm_animator$Animator$Inline$opacity, model.animationState, fadeIn));
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
-	return {$: 'Specified', a: a};
-};
-var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
-	function (a, b, c) {
-		return {$: 'Oscillate', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
-	return {$: 'PartialDefault', a: a};
-};
-var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
-var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
-var $mdgriffith$elm_animator$Animator$withDefault = F2(
-	function (toDef, currentDefault) {
-		if (currentDefault.$ === 'FullDefault') {
-			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
-				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
-		} else {
-			var thing = currentDefault.a;
-			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
-				toDef(thing));
-		}
-	});
-var $mdgriffith$elm_animator$Animator$applyOption = F2(
-	function (toOption, movement) {
-		if (movement.$ === 'Position') {
-			var personality = movement.a;
-			var pos = movement.b;
-			return A2(
-				$mdgriffith$elm_animator$Internal$Interpolate$Position,
-				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
-				pos);
-		} else {
-			var personality = movement.a;
-			var dur = movement.b;
-			var fn = movement.c;
-			return A3(
-				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
-				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
-				dur,
-				fn);
-		}
-	});
-var $elm$core$Basics$clamp = F3(
-	function (low, high, number) {
-		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
-	});
-var $mdgriffith$elm_animator$Animator$leaveSmoothly = F2(
-	function (s, movement) {
-		return A2(
-			$mdgriffith$elm_animator$Animator$applyOption,
-			function (def) {
-				return _Utils_update(
-					def,
-					{
-						departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
-							A3($elm$core$Basics$clamp, 0, 1, s))
-					});
-			},
-			movement);
 	});
 var $author$project$Tuesday$wordFadeOutAnimation = F2(
 	function (model, wordIndex) {

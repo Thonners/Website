@@ -22,7 +22,7 @@ fadeInDelayWord =
 
 burpeeDelay : Float
 burpeeDelay =
-    0.5
+    1.0
 
 
 fadeOutDelayWord : Float
@@ -109,15 +109,48 @@ type alias Model =
     }
 
 
+animationQuene : Animator.Timeline AnimationState -> Animator.Timeline AnimationState
+animationQuene =
+    Animator.queue
+        ([ Animator.wait (Animator.seconds 1)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 0)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 1)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 2)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 3)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 4)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
+         , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
+         , Animator.wait (Animator.seconds 0.2)
+
+         --  , Animator.event (Animator.seconds 1.5) SlideLeft
+         --  , Animator.wait (Animator.seconds 0.2)
+         ]
+            ++ burpeeStates
+            ++ wordRevealAnimationStates 0
+            ++ wordRevealAnimationStates 1
+            ++ wordRevealAnimationStates 2
+            ++ wordRevealAnimationStates 3
+            ++ wordRevealAnimationStates 4
+            ++ wordRevealAnimationStates 5
+            ++ burpeeStates
+        )
+
+
 burpeeStates : List (Animator.Step AnimationState)
 burpeeStates =
     [ Animator.event (Animator.seconds burpeeDelay) (Burpee Standing)
+    , Animator.wait (Animator.seconds 0.2)
     , Animator.event (Animator.seconds burpeeDelay) (Burpee Folding)
+    , Animator.wait (Animator.seconds 0.2)
     , Animator.event (Animator.seconds burpeeDelay) (Burpee Prone)
+    , Animator.wait (Animator.seconds 0.2)
     , Animator.event (Animator.seconds burpeeDelay) (Burpee Folding)
+    , Animator.wait (Animator.seconds 0.2)
     , Animator.event (Animator.seconds burpeeDelay) (Burpee Standing)
     , Animator.event (Animator.seconds burpeeDelay) (Burpee Jumping)
     , Animator.event (Animator.seconds burpeeDelay) (Burpee Standing)
+    , Animator.wait (Animator.seconds 0.2)
     ]
 
 
@@ -139,33 +172,9 @@ wordRevealAnimationStates currentIndex =
 
 init : Device -> ScreenSize -> ( Model, Cmd Msg )
 init device screenSize =
-    let
-        fadeInQueue =
-            Animator.queue
-                ([ Animator.wait (Animator.seconds 1)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 0)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 1)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 2)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 3)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 4)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
-                 , Animator.wait (Animator.seconds 0.2)
-                 , Animator.event (Animator.seconds 1.5) SlideLeft
-                 , Animator.wait (Animator.seconds 0.2)
-                 ]
-                    ++ wordRevealAnimationStates 0
-                    ++ wordRevealAnimationStates 1
-                    ++ wordRevealAnimationStates 2
-                    ++ wordRevealAnimationStates 3
-                    ++ wordRevealAnimationStates 4
-                    ++ wordRevealAnimationStates 5
-                )
-    in
     ( { device = device
       , screenSize = screenSize
-      , animationState = fadeInQueue <| Animator.init NotStarted
+      , animationState = animationQuene <| Animator.init NotStarted
       }
     , Cmd.none
     )
@@ -308,7 +317,7 @@ upMoveAmount model letterIndex =
         windowHeightWithoutPadding =
             toFloat (model.screenSize.windowHeight - 2 * padding)
 
-        verticalOffset =
+        verticalOffsetForCentring =
             if fontSizeSetByHorizontalConstraint model then
                 -- 3.5 would be the value to put it in the middle of the screen, but it looks better a bit higher up
                 (-1.5 + toFloat letterIndex) * toFloat (fontSize model + verticalSpacing)
@@ -316,8 +325,11 @@ upMoveAmount model letterIndex =
             else
                 (windowHeightWithoutPadding / toFloat tuesdaysLength * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
 
-        preMovement =
-            Animator.at <| verticalOffset
+        centred =
+            Animator.at <| verticalOffsetForCentring
+
+        bottomOfScreen =
+            Animator.at <| verticalOffsetForCentring - windowHeightWithoutPadding / 2
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -327,14 +339,60 @@ upMoveAmount model letterIndex =
             (\animationState ->
                 case animationState of
                     NotStarted ->
-                        preMovement
+                        centred
 
                     FadeInLetter _ ->
-                        preMovement
+                        centred
+
+                    Burpee phaseOfBurpee ->
+                        burpeeVerticalPositioning phaseOfBurpee letterIndex (fontSize model) windowHeightWithoutPadding verticalOffsetForCentring
+                            |> Animator.at
+                            |> Animator.leaveSmoothly 1
+                            |> Animator.arriveSmoothly 0.2
 
                     _ ->
                         Animator.at <| 0
             )
+
+
+burpeeVerticalPositioning : BurpeeState -> Int -> Int -> Float -> Float -> Float
+burpeeVerticalPositioning phaseOfBurpee letterIndex fontsize windowHeightWithoutPadding verticalOffsetForCentring =
+    let
+        bottomOfScreen =
+            verticalOffsetForCentring - windowHeightWithoutPadding / 2
+    in
+    case phaseOfBurpee of
+        Standing ->
+            0
+
+        Folding ->
+            if letterIndex < 4 then
+                bottomOfScreen + toFloat (letterIndex * fontsize)
+
+            else
+                bottomOfScreen + toFloat ((tuesdaysLength - letterIndex) * fontsize)
+
+        Prone ->
+            bottomOfScreen
+
+        Jumping ->
+            20
+
+
+burpeeHorizontalPositioning : BurpeeState -> Int -> Int -> Float
+burpeeHorizontalPositioning phaseOfBurpee letterIndex fontWidth =
+    case phaseOfBurpee of
+        Standing ->
+            0
+
+        Folding ->
+            0.2 * toFloat (fontWidth * letterIndex)
+
+        Prone ->
+            toFloat (fontWidth * letterIndex)
+
+        Jumping ->
+            0
 
 
 rightMoveAmount : Model -> Int -> Float
@@ -368,6 +426,12 @@ rightMoveAmount model letterIndex =
 
                     FadeInLetter _ ->
                         preMovement
+
+                    Burpee phaseOfBurpee ->
+                        burpeeHorizontalPositioning phaseOfBurpee letterIndex fontWidth
+                            |> Animator.at
+                            |> Animator.leaveSmoothly 1
+                            |> Animator.arriveSmoothly 0.2
 
                     _ ->
                         Animator.at <| 0
