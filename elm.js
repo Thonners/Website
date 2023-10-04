@@ -15318,7 +15318,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['UESDAYS', 'rain', 'onight', 'o', 'hrough']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 255, 0, 0),
-		$author$project$Tuesday$FadeInLetter(1),
+		$author$project$Tuesday$FadeInLetter(0),
 		A2($author$project$Tuesday$FadeInWord, 0, 0)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15326,7 +15326,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['plifts', 'ntil', 'ltra', 's', 'ltimate']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 220, 100, 23),
-		$author$project$Tuesday$FadeInLetter(2),
+		$author$project$Tuesday$FadeInLetter(1),
 		A2($author$project$Tuesday$FadeInWord, 0, 1)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15334,7 +15334,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['veryone', 'very', 'lderly', 'very', 'ffort']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 255, 255, 0),
-		$author$project$Tuesday$FadeInLetter(3),
+		$author$project$Tuesday$FadeInLetter(2),
 		A2($author$project$Tuesday$FadeInWord, 0, 2)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15342,7 +15342,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['timulating', 'inew', 'oldiers', 'ession', 'enescent']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 0, 255, 0),
-		$author$project$Tuesday$FadeInLetter(4),
+		$author$project$Tuesday$FadeInLetter(3),
 		A2($author$project$Tuesday$FadeInWord, 0, 3)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15350,7 +15350,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['evelopment', 'evelops', 'ominate', 'emands', 'udes']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 255),
-		$author$project$Tuesday$FadeInLetter(5),
+		$author$project$Tuesday$FadeInLetter(4),
 		A2($author$project$Tuesday$FadeInWord, 0, 4)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15358,7 +15358,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['nd', 'nd', 'thleticism;', 'll', 'chieve']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 75, 0, 130),
-		$author$project$Tuesday$FadeInLetter(6),
+		$author$project$Tuesday$FadeInLetter(5),
 		A2($author$project$Tuesday$FadeInWord, 0, 5)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15366,7 +15366,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['outhful', 'ields', 'ouths', 'our', 'outhful']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255),
-		$author$project$Tuesday$FadeInLetter(7),
+		$author$project$Tuesday$FadeInLetter(6),
 		A2($author$project$Tuesday$FadeInWord, 0, 6)),
 		A5(
 		$author$project$Tuesday$LetterDetails,
@@ -15374,7 +15374,7 @@ var $author$project$Tuesday$tuesdays = _List_fromArray(
 		_List_fromArray(
 			['pirit', 'atisfaction', 'truggle', 'pirit', 'tate']),
 		A3($mdgriffith$elm_ui$Element$rgb255, 127, 0, 255),
-		$author$project$Tuesday$FadeInLetter(8),
+		$author$project$Tuesday$FadeInLetter(7),
 		A2($author$project$Tuesday$FadeInWord, 0, 7))
 	]);
 var $author$project$Tuesday$tuesdaysLength = $elm$core$List$length($author$project$Tuesday$tuesdays);
@@ -15489,145 +15489,7 @@ var $author$project$Tuesday$fontSizeSetByHorizontalConstraint = function (model)
 		$author$project$Tuesday$horizontallyDeterminedFontSize(model),
 		$author$project$Tuesday$verticallyDeterminedFontSize(model)) < 0;
 };
-var $author$project$Tuesday$rightMoveAmount = F2(
-	function (model, letterIndex) {
-		var fontWidth = $elm$core$Basics$round(
-			$author$project$Tuesday$fontSizeAspectRatio * $author$project$Tuesday$fontSize(model));
-		var horizontalFontSizePlusSpacing = fontWidth + $author$project$Tuesday$letterSpacing;
-		var leftOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? 0 : ((model.screenSize.windowWidth - ($author$project$Tuesday$tuesdaysLength * horizontalFontSizePlusSpacing)) / 2);
-		var preMovement = $mdgriffith$elm_animator$Animator$at((horizontalFontSizePlusSpacing * letterIndex) + leftOffset);
-		return _Utils_eq(
-			$mdgriffith$elm_animator$Animator$current(model.animationState),
-			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
-			$mdgriffith$elm_animator$Animator$move,
-			model.animationState,
-			function (animationState) {
-				switch (animationState.$) {
-					case 'NotStarted':
-						return preMovement;
-					case 'FadeInLetter':
-						return preMovement;
-					default:
-						return $mdgriffith$elm_animator$Animator$at(0);
-				}
-			});
-	});
-var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
-var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
-var $mdgriffith$elm_ui$Element$row = F2(
-	function (attrs, children) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asRow,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
-					A2(
-						$elm$core$List$cons,
-						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
-						attrs))),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
-	});
-var $mdgriffith$elm_ui$Element$Font$family = function (families) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
-		A2(
-			$mdgriffith$elm_ui$Internal$Model$FontFamily,
-			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
-			families));
-};
-var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
-var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
-var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family(
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$Font$typeface('Virgil'),
-			$mdgriffith$elm_ui$Element$Font$sansSerif
-		]));
-var $author$project$Tuesday$upMoveAmount = F2(
-	function (model, letterIndex) {
-		var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
-		var verticalOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? (((-1.5) + letterIndex) * ($author$project$Tuesday$fontSize(model) + $author$project$Tuesday$verticalSpacing)) : (((windowHeightWithoutPadding / $author$project$Tuesday$tuesdaysLength) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
-		var preMovement = $mdgriffith$elm_animator$Animator$at(verticalOffset);
-		return _Utils_eq(
-			$mdgriffith$elm_animator$Animator$current(model.animationState),
-			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
-			$mdgriffith$elm_animator$Animator$move,
-			model.animationState,
-			function (animationState) {
-				switch (animationState.$) {
-					case 'NotStarted':
-						return preMovement;
-					case 'FadeInLetter':
-						return preMovement;
-					default:
-						return $mdgriffith$elm_animator$Animator$at(0);
-				}
-			});
-	});
-var $author$project$Tuesday$wordAppearAnimation = F3(
-	function (model, targetAnimationState, targetWordNumber) {
-		var stateValueToString = function (value) {
-			return (value > 0) ? 'flex' : 'none';
-		};
-		var showWord = function (state) {
-			switch (state.$) {
-				case 'NotStarted':
-					return $mdgriffith$elm_animator$Animator$at(0);
-				case 'FadeInLetter':
-					return $mdgriffith$elm_animator$Animator$at(0);
-				case 'SlideLeft':
-					return $mdgriffith$elm_animator$Animator$at(0);
-				case 'FadeInWord':
-					var wordIndex = state.a;
-					if (targetAnimationState.$ === 'FadeInWord') {
-						return _Utils_eq(wordIndex, targetWordNumber) ? $mdgriffith$elm_animator$Animator$at(1) : $mdgriffith$elm_animator$Animator$at(0);
-					} else {
-						return $mdgriffith$elm_animator$Animator$at(0);
-					}
-				case 'FadeOut':
-					var currentIndex = state.a;
-					return _Utils_eq(currentIndex, targetWordNumber) ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(0);
-				default:
-					return $mdgriffith$elm_animator$Animator$at(1);
-			}
-		};
-		return $mdgriffith$elm_ui$Element$htmlAttribute(
-			A4($mdgriffith$elm_animator$Animator$Inline$style, model.animationState, 'display', stateValueToString, showWord));
-	});
-var $author$project$Tuesday$wordFadeInAnimation = F3(
-	function (model, targetAnimationState, targetWordInListIndex) {
-		var fadeIn = function (state) {
-			switch (state.$) {
-				case 'FadeInWord':
-					var wordIndex = state.a;
-					var currentRow = state.b;
-					if (targetAnimationState.$ === 'FadeInWord') {
-						var targetRow = targetAnimationState.b;
-						return (_Utils_eq(wordIndex, targetWordInListIndex) && (_Utils_cmp(currentRow, targetRow) > -1)) ? $mdgriffith$elm_animator$Animator$at(1) : $mdgriffith$elm_animator$Animator$at(0);
-					} else {
-						return $mdgriffith$elm_animator$Animator$at(0);
-					}
-				case 'NotStarted':
-					return $mdgriffith$elm_animator$Animator$at(0);
-				case 'FadeInLetter':
-					return $mdgriffith$elm_animator$Animator$at(0);
-				case 'SlideLeft':
-					return $mdgriffith$elm_animator$Animator$at(0);
-				case 'FadeOut':
-					return $mdgriffith$elm_animator$Animator$at(0);
-				default:
-					return $mdgriffith$elm_animator$Animator$at(1);
-			}
-		};
-		return $mdgriffith$elm_ui$Element$htmlAttribute(
-			A2($mdgriffith$elm_animator$Animator$Inline$opacity, model.animationState, fadeIn));
-	});
+var $author$project$Tuesday$initialMovementStagger = 0.1;
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
 };
@@ -15675,6 +15537,220 @@ var $elm$core$Basics$clamp = F3(
 	function (low, high, number) {
 		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
 	});
+var $mdgriffith$elm_animator$Animator$leaveLate = F2(
+	function (p, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						departLate: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, p))
+					});
+			},
+			movement);
+	});
+var $author$project$Tuesday$rightMoveAmount = F2(
+	function (model, letterIndex) {
+		var fontWidth = $elm$core$Basics$round(
+			$author$project$Tuesday$fontSizeAspectRatio * $author$project$Tuesday$fontSize(model));
+		var horizontalFontSizePlusSpacing = fontWidth + $author$project$Tuesday$letterSpacing;
+		var leftOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? 0 : ((model.screenSize.windowWidth - ($author$project$Tuesday$tuesdaysLength * horizontalFontSizePlusSpacing)) / 2);
+		var preMovement = A2(
+			$mdgriffith$elm_animator$Animator$leaveLate,
+			letterIndex * $author$project$Tuesday$initialMovementStagger,
+			$mdgriffith$elm_animator$Animator$at((horizontalFontSizePlusSpacing * letterIndex) + leftOffset));
+		return _Utils_eq(
+			$mdgriffith$elm_animator$Animator$current(model.animationState),
+			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
+			$mdgriffith$elm_animator$Animator$move,
+			model.animationState,
+			function (animationState) {
+				switch (animationState.$) {
+					case 'NotStarted':
+						return preMovement;
+					case 'FadeInLetter':
+						return preMovement;
+					default:
+						return A2(
+							$mdgriffith$elm_animator$Animator$leaveLate,
+							letterIndex * $author$project$Tuesday$initialMovementStagger,
+							$mdgriffith$elm_animator$Animator$at(0));
+				}
+			});
+	});
+var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
+var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
+var $mdgriffith$elm_ui$Element$row = F2(
+	function (attrs, children) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asRow,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+						attrs))),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
+	});
+var $mdgriffith$elm_ui$Element$Font$family = function (families) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
+		A2(
+			$mdgriffith$elm_ui$Internal$Model$FontFamily,
+			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
+			families));
+};
+var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
+var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
+var $author$project$Tuesday$tuesdayFont = $mdgriffith$elm_ui$Element$Font$family(
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$Font$typeface('Virgil'),
+			$mdgriffith$elm_ui$Element$Font$sansSerif
+		]));
+var $author$project$Tuesday$upMoveAmount = F2(
+	function (model, letterIndex) {
+		var windowHeightWithoutPadding = model.screenSize.windowHeight - (2 * $author$project$Tuesday$padding);
+		var verticalOffset = $author$project$Tuesday$fontSizeSetByHorizontalConstraint(model) ? (((-1.5) + letterIndex) * ($author$project$Tuesday$fontSize(model) + $author$project$Tuesday$verticalSpacing)) : (((windowHeightWithoutPadding / $author$project$Tuesday$tuesdaysLength) * (letterIndex + 1)) - (windowHeightWithoutPadding / 2));
+		var preMovement = A2(
+			$mdgriffith$elm_animator$Animator$leaveLate,
+			letterIndex * $author$project$Tuesday$initialMovementStagger,
+			$mdgriffith$elm_animator$Animator$at(verticalOffset));
+		return _Utils_eq(
+			$mdgriffith$elm_animator$Animator$current(model.animationState),
+			$author$project$Tuesday$WordsDisplayed) ? 0 : A2(
+			$mdgriffith$elm_animator$Animator$move,
+			model.animationState,
+			function (animationState) {
+				switch (animationState.$) {
+					case 'NotStarted':
+						return preMovement;
+					case 'FadeInLetter':
+						return preMovement;
+					default:
+						return $mdgriffith$elm_animator$Animator$at(0);
+				}
+			});
+	});
+var $author$project$Tuesday$wordAppearAnimation = F3(
+	function (model, targetAnimationState, targetWordNumber) {
+		var stateValueToString = function (value) {
+			return (value > 0) ? 'flex' : 'none';
+		};
+		var showWord = function (state) {
+			switch (state.$) {
+				case 'NotStarted':
+					return $mdgriffith$elm_animator$Animator$at(0);
+				case 'FadeInLetter':
+					return $mdgriffith$elm_animator$Animator$at(0);
+				case 'SlideLeft':
+					return $mdgriffith$elm_animator$Animator$at(0);
+				case 'FadeInWord':
+					var wordIndex = state.a;
+					if (targetAnimationState.$ === 'FadeInWord') {
+						return _Utils_eq(wordIndex, targetWordNumber) ? $mdgriffith$elm_animator$Animator$at(1) : $mdgriffith$elm_animator$Animator$at(0);
+					} else {
+						return $mdgriffith$elm_animator$Animator$at(0);
+					}
+				case 'FadeOut':
+					var currentIndex = state.a;
+					return _Utils_eq(currentIndex, targetWordNumber) ? $mdgriffith$elm_animator$Animator$at(0) : $mdgriffith$elm_animator$Animator$at(0);
+				default:
+					return $mdgriffith$elm_animator$Animator$at(1);
+			}
+		};
+		return $mdgriffith$elm_ui$Element$htmlAttribute(
+			A4($mdgriffith$elm_animator$Animator$Inline$style, model.animationState, 'display', stateValueToString, showWord));
+	});
+var $mdgriffith$elm_animator$Animator$arriveEarly = F2(
+	function (p, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, p))
+					});
+			},
+			movement);
+	});
+var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
+var $author$project$Tuesday$wordFadeInAnimation = F3(
+	function (model, targetAnimationState, targetWordInListIndex) {
+		var fadeIn = function (state) {
+			switch (state.$) {
+				case 'FadeInWord':
+					var wordIndex = state.a;
+					var currentRow = state.b;
+					if (targetAnimationState.$ === 'FadeInWord') {
+						var targetRow = targetAnimationState.b;
+						return (_Utils_eq(wordIndex, targetWordInListIndex) && (_Utils_cmp(currentRow, targetRow) > -1)) ? A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							0.5,
+							$mdgriffith$elm_animator$Animator$at(1)) : A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							0.5,
+							$mdgriffith$elm_animator$Animator$at(0));
+					} else {
+						return A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							0.5,
+							$mdgriffith$elm_animator$Animator$at(0));
+					}
+				case 'NotStarted':
+					return A2(
+						$mdgriffith$elm_animator$Animator$arriveSmoothly,
+						0.5,
+						$mdgriffith$elm_animator$Animator$at(0));
+				case 'FadeInLetter':
+					return A2(
+						$mdgriffith$elm_animator$Animator$arriveSmoothly,
+						0.5,
+						$mdgriffith$elm_animator$Animator$at(0));
+				case 'SlideLeft':
+					return A2(
+						$mdgriffith$elm_animator$Animator$arriveSmoothly,
+						0.5,
+						$mdgriffith$elm_animator$Animator$at(0));
+				case 'FadeOut':
+					return A2(
+						$mdgriffith$elm_animator$Animator$arriveEarly,
+						0.05,
+						A2(
+							$mdgriffith$elm_animator$Animator$arriveSmoothly,
+							1,
+							$mdgriffith$elm_animator$Animator$at(0)));
+				default:
+					return $mdgriffith$elm_animator$Animator$at(1);
+			}
+		};
+		return $mdgriffith$elm_ui$Element$htmlAttribute(
+			A2($mdgriffith$elm_animator$Animator$Inline$opacity, model.animationState, fadeIn));
+	});
 var $mdgriffith$elm_animator$Animator$leaveSmoothly = F2(
 	function (s, movement) {
 		return A2(
@@ -15697,7 +15773,7 @@ var $author$project$Tuesday$wordFadeOutAnimation = F2(
 				return _Utils_eq(wordIndex, indexToFade) ? A2(
 					$mdgriffith$elm_animator$Animator$leaveSmoothly,
 					1,
-					$mdgriffith$elm_animator$Animator$at(-100)) : $mdgriffith$elm_animator$Animator$at(0);
+					$mdgriffith$elm_animator$Animator$at(-200)) : $mdgriffith$elm_animator$Animator$at(0);
 			} else {
 				return $mdgriffith$elm_animator$Animator$at(0);
 			}

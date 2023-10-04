@@ -10,6 +10,21 @@ import Responsive exposing (ScreenSize)
 import Time
 
 
+fadeInStagger : Float
+fadeInStagger =
+    0.1
+
+
+fadeOutStagger : Float
+fadeOutStagger =
+    0.1
+
+
+initialMovementStagger : Float
+initialMovementStagger =
+    0.1
+
+
 fadeInDelayLetter : Float
 fadeInDelayLetter =
     0.5
@@ -56,14 +71,14 @@ type alias LetterDetails =
 
 tuesdays : List LetterDetails
 tuesdays =
-    [ LetterDetails "T" [ "UESDAYS", "rain", "onight", "o", "hrough" ] (rgb255 255 0 0) (FadeInLetter 1) (FadeInWord 0 0)
-    , LetterDetails "U" [ "plifts", "ntil", "ltra", "s", "ltimate" ] (rgb255 220 100 23) (FadeInLetter 2) (FadeInWord 0 1)
-    , LetterDetails "E" [ "veryone", "very", "lderly", "very", "ffort" ] (rgb255 255 255 0) (FadeInLetter 3) (FadeInWord 0 2)
-    , LetterDetails "S" [ "timulating", "inew", "oldiers", "ession", "enescent" ] (rgb255 0 255 0) (FadeInLetter 4) (FadeInWord 0 3)
-    , LetterDetails "D" [ "evelopment", "evelops", "ominate", "emands", "udes" ] (rgb255 0 0 255) (FadeInLetter 5) (FadeInWord 0 4)
-    , LetterDetails "A" [ "nd", "nd", "thleticism;", "ll", "chieve" ] (rgb255 75 0 130) (FadeInLetter 6) (FadeInWord 0 5)
-    , LetterDetails "Y" [ "outhful", "ields", "ouths", "our", "outhful" ] (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 0 6)
-    , LetterDetails "S" [ "pirit", "atisfaction", "truggle", "pirit", "tate" ] (rgb255 127 0 255) (FadeInLetter 8) (FadeInWord 0 7)
+    [ LetterDetails "T" [ "UESDAYS", "rain", "onight", "o", "hrough" ] (rgb255 255 0 0) (FadeInLetter 0) (FadeInWord 0 0)
+    , LetterDetails "U" [ "plifts", "ntil", "ltra", "s", "ltimate" ] (rgb255 220 100 23) (FadeInLetter 1) (FadeInWord 0 1)
+    , LetterDetails "E" [ "veryone", "very", "lderly", "very", "ffort" ] (rgb255 255 255 0) (FadeInLetter 2) (FadeInWord 0 2)
+    , LetterDetails "S" [ "timulating", "inew", "oldiers", "ession", "enescent" ] (rgb255 0 255 0) (FadeInLetter 3) (FadeInWord 0 3)
+    , LetterDetails "D" [ "evelopment", "evelops", "ominate", "emands", "udes" ] (rgb255 0 0 255) (FadeInLetter 4) (FadeInWord 0 4)
+    , LetterDetails "A" [ "nd", "nd", "thleticism;", "ll", "chieve" ] (rgb255 75 0 130) (FadeInLetter 5) (FadeInWord 0 5)
+    , LetterDetails "Y" [ "outhful", "ields", "ouths", "our", "outhful" ] (rgb255 127 0 255) (FadeInLetter 6) (FadeInWord 0 6)
+    , LetterDetails "S" [ "pirit", "atisfaction", "truggle", "pirit", "tate" ] (rgb255 127 0 255) (FadeInLetter 7) (FadeInWord 0 7)
     ]
 
 
@@ -291,7 +306,9 @@ upMoveAmount model letterIndex =
                 (windowHeightWithoutPadding / toFloat tuesdaysLength * (toFloat letterIndex + 1)) - (windowHeightWithoutPadding / 2)
 
         preMovement =
-            Animator.at <| verticalOffset
+            verticalOffset
+                |> Animator.at
+                |> Animator.leaveLate (toFloat letterIndex * initialMovementStagger)
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -328,7 +345,10 @@ rightMoveAmount model letterIndex =
                 toFloat (model.screenSize.windowWidth - tuesdaysLength * horizontalFontSizePlusSpacing) / 2
 
         preMovement =
-            Animator.at <| toFloat (horizontalFontSizePlusSpacing * letterIndex) + leftOffset
+            toFloat (horizontalFontSizePlusSpacing * letterIndex)
+                + leftOffset
+                |> Animator.at
+                |> Animator.leaveLate (toFloat letterIndex * initialMovementStagger)
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -344,7 +364,9 @@ rightMoveAmount model letterIndex =
                         preMovement
 
                     _ ->
-                        Animator.at <| 0
+                        0
+                            |> Animator.at
+                            |> Animator.leaveLate (toFloat letterIndex * initialMovementStagger)
             )
 
 
@@ -388,24 +410,32 @@ wordFadeInAnimation model targetAnimationState targetWordInListIndex =
                         FadeInWord _ targetRow ->
                             if wordIndex == targetWordInListIndex && currentRow >= targetRow then
                                 Animator.at 1
+                                    |> Animator.arriveSmoothly 0.5
 
                             else
                                 Animator.at 0
+                                    |> Animator.arriveSmoothly 0.5
 
                         _ ->
                             Animator.at 0
+                                |> Animator.arriveSmoothly 0.5
 
                 NotStarted ->
                     Animator.at 0
+                        |> Animator.arriveSmoothly 0.5
 
                 FadeInLetter _ ->
                     Animator.at 0
+                        |> Animator.arriveSmoothly 0.5
 
                 SlideLeft ->
                     Animator.at 0
+                        |> Animator.arriveSmoothly 0.5
 
                 FadeOut _ ->
                     Animator.at 0
+                        |> Animator.arriveSmoothly 1
+                        |> Animator.arriveEarly 0.05
 
                 WordsDisplayed ->
                     Animator.at 1
@@ -421,7 +451,7 @@ wordFadeOutAnimation model wordIndex =
             case state of
                 FadeOut indexToFade ->
                     if wordIndex == indexToFade then
-                        toFloat -100
+                        toFloat -200
                             |> Animator.at
                             |> Animator.leaveSmoothly 1
 
