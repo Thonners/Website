@@ -5,6 +5,7 @@ import Browser exposing (Document, UrlRequest)
 import Browser.Dom
 import Browser.Events
 import Browser.Navigation as Nav
+import Crossword
 import Dict exposing (Dict)
 import Element exposing (..)
 import Element.Background as Background
@@ -31,6 +32,7 @@ type alias Model =
 type Msg
     = HomePageMsg Home.Msg
     | TuesdayMsg Tuesday.Msg
+    | CrosswordMsg Crossword.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | GotNewScreenSize Int Int
@@ -46,6 +48,7 @@ type Subscription
 type Page
     = HomePage Home.Model
     | TuesdayPage Tuesday.Model
+    | CrosswordPage Crossword.Model
     | NotFoundPage
 
 
@@ -84,6 +87,13 @@ initCurrentPage ( model, existingCmds ) =
                             Tuesday.init model.device model.screenSize
                     in
                     ( TuesdayPage pageModel, Cmd.map TuesdayMsg pageCmds )
+
+                Route.CrosswordToolkit ->
+                    let
+                        ( pageModel, pageCmds ) =
+                            Crossword.init model.device model.screenSize
+                    in
+                    ( CrosswordPage pageModel, Cmd.map CrosswordMsg pageCmds )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -114,6 +124,10 @@ view model =
             TuesdayPage pageModel ->
                 Tuesday.view pageModel
                     |> Html.map TuesdayMsg
+
+            CrosswordPage pageModel ->
+                Crossword.view pageModel
+                    |> Html.map CrosswordMsg
         ]
     }
 
@@ -123,6 +137,9 @@ subscriptions model =
     let
         pageSub =
             case model.page of
+                CrosswordPage m ->
+                    Sub.map CrosswordMsg (Crossword.subscriptions m)
+
                 TuesdayPage m ->
                     Sub.map TuesdayMsg (Tuesday.subscriptions m)
 

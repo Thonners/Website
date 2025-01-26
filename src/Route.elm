@@ -8,6 +8,7 @@ type Route
     = NotFound
     | Home
     | Tuesday
+    | CrosswordToolkit
 
 
 parseUrl : Url -> Route
@@ -25,4 +26,5 @@ matchRoute =
     oneOf
         [ map Home top
         , map Tuesday (s "tuesday")
+        , map CrosswordToolkit (s "crosswordtoolkit")
         ]
