@@ -9,6 +9,7 @@ type Route
     | Home
     | Tuesday
     | CrosswordToolkit
+    | Lanky
 
 
 parseUrl : Url -> Route
@@ -27,4 +28,5 @@ matchRoute =
         [ map Home top
         , map Tuesday (s "tuesday")
         , map CrosswordToolkit (s "crosswordtoolkit")
+        , map Lanky (s "lanky")
         ]

@@ -4372,6 +4372,52 @@ function _Browser_load(url)
 }
 
 
+
+function _Time_now(millisToPosix)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});
+
+function _Time_here()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
+
+
+function _Time_getZoneName()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
+}
+
+
 function _Url_percentEncode(string)
 {
 	return encodeURIComponent(string);
@@ -5254,6 +5300,12 @@ var $author$project$Main$HomePage = function (a) {
 var $author$project$Main$HomePageMsg = function (a) {
 	return {$: 'HomePageMsg', a: a};
 };
+var $author$project$Main$LankyMsg = function (a) {
+	return {$: 'LankyMsg', a: a};
+};
+var $author$project$Main$LankyPage = function (a) {
+	return {$: 'LankyPage', a: a};
+};
 var $author$project$Main$TuesdayMsg = function (a) {
 	return {$: 'TuesdayMsg', a: a};
 };
@@ -5455,6 +5507,30 @@ var $author$project$Home$init = F2(
 			},
 			$elm$core$Platform$Cmd$none);
 	});
+var $author$project$Lanky$Model = function (remainingTime) {
+	return {remainingTime: remainingTime};
+};
+var $author$project$Lanky$Tick = function (a) {
+	return {$: 'Tick', a: a};
+};
+var $author$project$Lanky$dueDate = 1754308800000;
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $author$project$Lanky$init = function (_v0) {
+	return _Utils_Tuple2(
+		$author$project$Lanky$Model($author$project$Lanky$dueDate),
+		A2($elm$core$Task$perform, $author$project$Lanky$Tick, $elm$time$Time$now));
+};
 var $author$project$Tuesday$FadeIn = {$: 'FadeIn'};
 var $author$project$Tuesday$NotStarted = {$: 'NotStarted'};
 var $author$project$Tuesday$SlideLeft = {$: 'SlideLeft'};
@@ -5771,13 +5847,20 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 				return _Utils_Tuple2(
 					$author$project$Main$TuesdayPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$TuesdayMsg, pageCmds));
-			default:
+			case 'CrosswordToolkit':
 				var _v5 = A2($author$project$Crossword$init, model.device, model.screenSize);
 				var pageModel = _v5.a;
 				var pageCmds = _v5.b;
 				return _Utils_Tuple2(
 					$author$project$Main$CrosswordPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$CrosswordMsg, pageCmds));
+			default:
+				var _v6 = $author$project$Lanky$init(_Utils_Tuple0);
+				var pageModel = _v6.a;
+				var pageCmds = _v6.b;
+				return _Utils_Tuple2(
+					$author$project$Main$LankyPage(pageModel),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$LankyMsg, pageCmds));
 		}
 	}();
 	var currentPage = _v1.a;
@@ -5793,6 +5876,7 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 var $author$project$Route$NotFound = {$: 'NotFound'};
 var $author$project$Route$CrosswordToolkit = {$: 'CrosswordToolkit'};
 var $author$project$Route$Home = {$: 'Home'};
+var $author$project$Route$Lanky = {$: 'Lanky'};
 var $author$project$Route$Tuesday = {$: 'Tuesday'};
 var $elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
@@ -5903,7 +5987,11 @@ var $author$project$Route$matchRoute = $elm$url$Url$Parser$oneOf(
 			A2(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$CrosswordToolkit,
-			$elm$url$Url$Parser$s('crosswordtoolkit'))
+			$elm$url$Url$Parser$s('crosswordtoolkit')),
+			A2(
+			$elm$url$Url$Parser$map,
+			$author$project$Route$Lanky,
+			$elm$url$Url$Parser$s('lanky'))
 		]));
 var $elm$url$Url$Parser$getFirstMatch = function (states) {
 	getFirstMatch:
@@ -8209,6 +8297,173 @@ var $author$project$Home$animator = A4(
 var $author$project$Home$subscriptions = function (model) {
 	return A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Home$RuntimeTriggeredAnimationStep, model, $author$project$Home$animator);
 };
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 'Every', a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {processes: processes, taggers: taggers};
+	});
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 'Nothing') {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
+var $elm$time$Time$setInterval = _Time_setInterval;
+var $elm$time$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		if (!intervals.b) {
+			return $elm$core$Task$succeed(processes);
+		} else {
+			var interval = intervals.a;
+			var rest = intervals.b;
+			var spawnTimer = $elm$core$Process$spawn(
+				A2(
+					$elm$time$Time$setInterval,
+					interval,
+					A2($elm$core$Platform$sendToSelf, router, interval)));
+			var spawnRest = function (id) {
+				return A3(
+					$elm$time$Time$spawnHelp,
+					router,
+					rest,
+					A3($elm$core$Dict$insert, interval, id, processes));
+			};
+			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var $elm$time$Time$onEffects = F3(
+	function (router, subs, _v0) {
+		var processes = _v0.processes;
+		var rightStep = F3(
+			function (_v6, id, _v7) {
+				var spawns = _v7.a;
+				var existing = _v7.b;
+				var kills = _v7.c;
+				return _Utils_Tuple3(
+					spawns,
+					existing,
+					A2(
+						$elm$core$Task$andThen,
+						function (_v5) {
+							return kills;
+						},
+						$elm$core$Process$kill(id)));
+			});
+		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
+		var leftStep = F3(
+			function (interval, taggers, _v4) {
+				var spawns = _v4.a;
+				var existing = _v4.b;
+				var kills = _v4.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, interval, spawns),
+					existing,
+					kills);
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _v3) {
+				var spawns = _v3.a;
+				var existing = _v3.b;
+				var kills = _v3.c;
+				return _Utils_Tuple3(
+					spawns,
+					A3($elm$core$Dict$insert, interval, id, existing),
+					kills);
+			});
+		var _v1 = A6(
+			$elm$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			processes,
+			_Utils_Tuple3(
+				_List_Nil,
+				$elm$core$Dict$empty,
+				$elm$core$Task$succeed(_Utils_Tuple0)));
+		var spawnList = _v1.a;
+		var existingDict = _v1.b;
+		var killTask = _v1.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (newProcesses) {
+				return $elm$core$Task$succeed(
+					A2($elm$time$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var $elm$time$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
+		if (_v0.$ === 'Nothing') {
+			return $elm$core$Task$succeed(state);
+		} else {
+			var taggers = _v0.a;
+			var tellTaggers = function (time) {
+				return $elm$core$Task$sequence(
+					A2(
+						$elm$core$List$map,
+						function (tagger) {
+							return A2(
+								$elm$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						taggers));
+			};
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$succeed(state);
+				},
+				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
+		}
+	});
+var $elm$time$Time$subMap = F2(
+	function (f, _v0) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		return A2(
+			$elm$time$Time$Every,
+			interval,
+			A2($elm$core$Basics$composeL, f, tagger));
+	});
+_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
+var $elm$time$Time$subscription = _Platform_leaf('Time');
+var $elm$time$Time$every = F2(
+	function (interval, tagger) {
+		return $elm$time$Time$subscription(
+			A2($elm$time$Time$Every, interval, tagger));
+	});
+var $author$project$Lanky$updateEvery = 11;
+var $author$project$Lanky$subscriptions = function (model) {
+	return A2($elm$time$Time$every, $author$project$Lanky$updateEvery, $author$project$Lanky$Tick);
+};
 var $author$project$Tuesday$RuntimeTriggeredAnimationStep = function (a) {
 	return {$: 'RuntimeTriggeredAnimationStep', a: a};
 };
@@ -8249,6 +8504,12 @@ var $author$project$Main$subscriptions = function (model) {
 					$elm$core$Platform$Sub$map,
 					$author$project$Main$HomePageMsg,
 					$author$project$Home$subscriptions(m));
+			case 'LankyPage':
+				var m = _v0.a;
+				return A2(
+					$elm$core$Platform$Sub$map,
+					$author$project$Main$LankyMsg,
+					$author$project$Lanky$subscriptions(m));
 			default:
 				return $elm$core$Platform$Sub$none;
 		}
@@ -8406,6 +8667,21 @@ var $author$project$Home$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Lanky$remainingTime = function (currentTime) {
+	return $author$project$Lanky$dueDate - currentTime;
+};
+var $author$project$Lanky$update = F2(
+	function (msg, model) {
+		var newTime = msg.a;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					remainingTime: $author$project$Lanky$remainingTime(
+						$elm$time$Time$posixToMillis(newTime))
+				}),
+			$elm$core$Platform$Cmd$none);
+	});
 var $author$project$Tuesday$update = F2(
 	function (msg, model) {
 		var newTime = msg.a;
@@ -8416,7 +8692,7 @@ var $author$project$Tuesday$update = F2(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(msg, model.page);
-		_v0$4:
+		_v0$5:
 		while (true) {
 			switch (_v0.a.$) {
 				case 'HomePageMsg':
@@ -8434,7 +8710,7 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$HomePageMsg, updatedCmd));
 					} else {
-						break _v0$4;
+						break _v0$5;
 					}
 				case 'TuesdayMsg':
 					if (_v0.b.$ === 'TuesdayPage') {
@@ -8451,7 +8727,24 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$TuesdayMsg, updatedCmd));
 					} else {
-						break _v0$4;
+						break _v0$5;
+					}
+				case 'LankyMsg':
+					if (_v0.b.$ === 'LankyPage') {
+						var subMsg = _v0.a.a;
+						var pageModel = _v0.b.a;
+						var _v3 = A2($author$project$Lanky$update, subMsg, pageModel);
+						var updatedPageModel = _v3.a;
+						var updatedCmd = _v3.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									page: $author$project$Main$LankyPage(updatedPageModel)
+								}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$LankyMsg, updatedCmd));
+					} else {
+						break _v0$5;
 					}
 				case 'LinkClicked':
 					var urlRequest = _v0.a.a;
@@ -8479,7 +8772,7 @@ var $author$project$Main$update = F2(
 								{route: newRoute}),
 							$elm$core$Platform$Cmd$none));
 				default:
-					break _v0$4;
+					break _v0$5;
 			}
 		}
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -15373,6 +15666,46 @@ var $author$project$Home$view = function (model) {
 			]),
 		$author$project$Home$wrapperView(model));
 };
+var $author$project$Lanky$remainingTimeString = function (model) {
+	var totalMilis = model.remainingTime % 1000;
+	var totalHours = model.remainingTime / ((60 * 60) * 1000);
+	var totalMinutes = (totalHours - $elm$core$Basics$floor(totalHours)) * 60;
+	var totalSeconds = (totalMinutes - $elm$core$Basics$floor(totalMinutes)) * 60;
+	var seconds = $elm$core$String$fromInt(
+		$elm$core$Basics$floor(totalSeconds));
+	var minutes = $elm$core$String$fromInt(
+		$elm$core$Basics$floor(totalMinutes));
+	var milis = $elm$core$String$fromInt(totalMilis);
+	var hours = $elm$core$String$fromInt(
+		$elm$core$Basics$floor(totalHours));
+	return hours + (':' + (minutes + (':' + (seconds + ('.' + milis)))));
+};
+var $author$project$Lanky$lankyCountdownLayout = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
+		_List_fromArray(
+			[
+				A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[$author$project$Font$handwritingFont, $mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text('Time remaining till Lanky is due:')),
+				A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[$author$project$Font$handwritingFont, $mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text(
+					$author$project$Lanky$remainingTimeString(model)))
+			]));
+};
+var $author$project$Lanky$view = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$layout,
+		_List_Nil,
+		$author$project$Lanky$lankyCountdownLayout(model));
+};
 var $author$project$Tuesday$fontSizeAspectRatio = 0.67;
 var $author$project$Tuesday$letterSpacing = 15;
 var $author$project$Tuesday$FadeInLetter = function (a) {
@@ -15961,10 +16294,13 @@ var $author$project$Tuesday$view = function (model) {
 var $author$project$Main$view = function (model) {
 	var title = function () {
 		var _v1 = model.page;
-		if (_v1.$ === 'TuesdayPage') {
-			return 'TUESDAY';
-		} else {
-			return 'Mathonwy Thomas';
+		switch (_v1.$) {
+			case 'TuesdayPage':
+				return 'TUESDAY';
+			case 'LankyPage':
+				return 'Lanky\'s ETA';
+			default:
+				return 'Mathonwy Thomas';
 		}
 	}();
 	return {
@@ -15987,12 +16323,18 @@ var $author$project$Main$view = function (model) {
 							$elm$html$Html$map,
 							$author$project$Main$TuesdayMsg,
 							$author$project$Tuesday$view(pageModel));
-					default:
+					case 'CrosswordPage':
 						var pageModel = _v0.a;
 						return A2(
 							$elm$html$Html$map,
 							$author$project$Main$CrosswordMsg,
 							$author$project$Crossword$view(pageModel));
+					default:
+						var pageModel = _v0.a;
+						return A2(
+							$elm$html$Html$map,
+							$author$project$Main$LankyMsg,
+							$author$project$Lanky$view(pageModel));
 				}
 			}()
 			]),

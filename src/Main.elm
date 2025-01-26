@@ -13,6 +13,7 @@ import Element.Events
 import Element.Font as Font
 import Home
 import Html exposing (Html)
+import Lanky
 import Responsive exposing (ScreenSize)
 import Route exposing (Route(..))
 import Time
@@ -33,6 +34,7 @@ type Msg
     = HomePageMsg Home.Msg
     | TuesdayMsg Tuesday.Msg
     | CrosswordMsg Crossword.Msg
+    | LankyMsg Lanky.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | GotNewScreenSize Int Int
@@ -49,6 +51,7 @@ type Page
     = HomePage Home.Model
     | TuesdayPage Tuesday.Model
     | CrosswordPage Crossword.Model
+    | LankyPage Lanky.Model
     | NotFoundPage
 
 
@@ -94,6 +97,13 @@ initCurrentPage ( model, existingCmds ) =
                             Crossword.init model.device model.screenSize
                     in
                     ( CrosswordPage pageModel, Cmd.map CrosswordMsg pageCmds )
+
+                Route.Lanky ->
+                    let
+                        ( pageModel, pageCmds ) =
+                            Lanky.init ()
+                    in
+                    ( LankyPage pageModel, Cmd.map LankyMsg pageCmds )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -107,6 +117,9 @@ view model =
             case model.page of
                 TuesdayPage _ ->
                     "TUESDAY"
+
+                LankyPage _ ->
+                    "Lanky's ETA"
 
                 _ ->
                     "Mathonwy Thomas"
@@ -128,6 +141,9 @@ view model =
             CrosswordPage pageModel ->
                 Crossword.view pageModel
                     |> Html.map CrosswordMsg
+
+            LankyPage pageModel ->
+                Lanky.view pageModel |> Html.map LankyMsg
         ]
     }
 
@@ -145,6 +161,9 @@ subscriptions model =
 
                 HomePage m ->
                     Sub.map HomePageMsg (Home.subscriptions m)
+
+                LankyPage m ->
+                    Sub.map LankyMsg (Lanky.subscriptions m)
 
                 NotFoundPage ->
                     Sub.none
@@ -186,6 +205,15 @@ update msg model =
             in
             ( { model | page = TuesdayPage updatedPageModel }
             , Cmd.map TuesdayMsg updatedCmd
+            )
+
+        ( LankyMsg subMsg, LankyPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    Lanky.update subMsg pageModel
+            in
+            ( { model | page = LankyPage updatedPageModel }
+            , Cmd.map LankyMsg updatedCmd
             )
 
         ( LinkClicked urlRequest, _ ) ->
