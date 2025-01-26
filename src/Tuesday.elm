@@ -5,6 +5,7 @@ import Animator.Inline
 import Element exposing (..)
 import Element.Background as Background
 import Element.Font as Font
+import Font exposing (handwritingFont)
 import Html exposing (Html)
 import Responsive exposing (ScreenSize)
 import Time
@@ -89,6 +90,7 @@ tuesdaysLength =
 
 type AnimationState
     = NotStarted
+    | FadeIn
     | FadeInLetter Int
     | SlideLeft
     | FadeInWord Int Int
@@ -133,14 +135,16 @@ init device screenSize =
         fadeInQueue =
             Animator.queue
                 ([ Animator.wait (Animator.seconds 1)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 0)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 1)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 2)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 3)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 4)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
-                 , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
+                 , Animator.event (Animator.seconds 10) FadeIn
+
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 0)
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 1)
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 2)
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 3)
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 4)
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 5)
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 6)
+                 --  , Animator.event (Animator.seconds fadeInDelayLetter) (FadeInLetter 7)
                  , Animator.event (Animator.seconds 1.5) SlideLeft
                  , Animator.wait (Animator.seconds 0.2)
                  ]
@@ -245,10 +249,11 @@ view model =
 
 tuesdayFont : Attribute Msg
 tuesdayFont =
-    Font.family
-        [ Font.typeface "Virgil"
-        , Font.sansSerif
-        ]
+    -- Font.family
+    --     [ Font.typeface "Virgil"
+    --     , Font.sansSerif
+    --     ]
+    handwritingFont
 
 
 tuesdayLayout : Model -> Element Msg
@@ -265,17 +270,22 @@ tuesdayLayout model =
 
 letterElement : Model -> Int -> LetterDetails -> Element Msg
 letterElement model letterIndex { letter, restOfWords, colour, targetLetterFadeInState, targetWordFadeInState } =
+    let
+        delay =
+            toFloat letterIndex * initialMovementStagger
+    in
     el
         [ Font.color colour
         , Font.size <| fontSize model
         , tuesdayFont
 
         -- , Element.Events.onMouseEnter Hovered
-        , moveRight <| rightMoveAmount model letterIndex
-        , moveUp <| upMoveAmount model letterIndex
+        , moveRight <| rightMoveAmount model letterIndex delay
+        , moveUp <| upMoveAmount model letterIndex delay
+        , letterFadeInAnimation model letterIndex delay
         ]
         (row []
-            ((el [ letterFadeInAnimation model targetLetterFadeInState ] <| text letter)
+            ((el [] <| text letter)
                 :: List.indexedMap
                     (\i restOfWord ->
                         el
@@ -291,9 +301,15 @@ letterElement model letterIndex { letter, restOfWords, colour, targetLetterFadeI
         )
 
 
-upMoveAmount : Model -> Int -> Float
-upMoveAmount model letterIndex =
+upMoveAmount : Model -> Int -> Float -> Float
+upMoveAmount model letterIndex delay =
     let
+        _ =
+            Debug.log "Mode up delay = " delay
+
+        _ =
+            Debug.log "letter Index = " letterIndex
+
         windowHeightWithoutPadding =
             toFloat (model.screenSize.windowHeight - 2 * padding)
 
@@ -308,7 +324,9 @@ upMoveAmount model letterIndex =
         preMovement =
             verticalOffset
                 |> Animator.at
-                |> Animator.leaveLate (toFloat letterIndex * initialMovementStagger)
+                |> Animator.leaveLate delay
+
+        --(toFloat letterIndex * initialMovementStagger)
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -323,14 +341,23 @@ upMoveAmount model letterIndex =
                     FadeInLetter _ ->
                         preMovement
 
+                    FadeIn ->
+                        preMovement
+
                     _ ->
                         Animator.at <| 0
             )
 
 
-rightMoveAmount : Model -> Int -> Float
-rightMoveAmount model letterIndex =
+rightMoveAmount : Model -> Int -> Float -> Float
+rightMoveAmount model letterIndex delay =
     let
+        _ =
+            Debug.log "Move right delay = " delay
+
+        _ =
+            Debug.log "letter Index = " letterIndex
+
         fontWidth =
             round <| fontSizeAspectRatio * toFloat (fontSize model)
 
@@ -348,7 +375,9 @@ rightMoveAmount model letterIndex =
             toFloat (horizontalFontSizePlusSpacing * letterIndex)
                 + leftOffset
                 |> Animator.at
-                |> Animator.leaveLate (toFloat letterIndex * initialMovementStagger)
+                |> Animator.leaveLate delay
+
+        --(toFloat letterIndex * initialMovementStagger)
     in
     if Animator.current model.animationState == WordsDisplayed then
         0
@@ -363,41 +392,70 @@ rightMoveAmount model letterIndex =
                     FadeInLetter _ ->
                         preMovement
 
+                    FadeIn ->
+                        preMovement
+
                     _ ->
                         0
                             |> Animator.at
-                            |> Animator.leaveLate (toFloat letterIndex * initialMovementStagger)
+             -- |> Animator.leaveLate (toFloat letterIndex * initialMovementStagger)
             )
 
 
-letterFadeInAnimation : Model -> AnimationState -> Attribute Msg
-letterFadeInAnimation model targetAnimationState =
+letterFadeInAnimation : Model -> Int -> Float -> Attribute Msg
+letterFadeInAnimation model letterIndex delay =
     let
-        animationComplete =
-            case Animator.current model.animationState of
-                FadeInLetter currentI ->
-                    case targetAnimationState of
-                        FadeInLetter targetI ->
-                            currentI > targetI
+        _ =
+            Debug.log "Move right delay = " delay
 
-                        _ ->
-                            False
+        _ =
+            Debug.log "letter Index = " letterIndex
+
+        fadeIn state =
+            case state of
+                FadeIn ->
+                    -- TODO: Update this properly
+                    1
+                        |> Animator.at
+                        |> Animator.leaveLate delay
+
+                FadeInLetter _ ->
+                    Animator.at 0
+                        |> Animator.leaveLate delay
 
                 NotStarted ->
-                    False
+                    Animator.at 0
+                        |> Animator.leaveLate delay
 
-                _ ->
-                    True
+                SlideLeft ->
+                    Animator.at 1
+                        |> Animator.leaveLate delay
+
+                FadeOut _ ->
+                    Animator.at 1
+                        |> Animator.leaveLate delay
+
+                WordsDisplayed ->
+                    Animator.at 1
+                        |> Animator.leaveLate delay
+
+                FadeInWord _ _ ->
+                    Animator.at 1
+                        |> Animator.leaveLate delay
     in
     htmlAttribute <|
-        Animator.Inline.opacity model.animationState
-            (\state ->
-                if state == targetAnimationState || animationComplete then
-                    Animator.at 1
+        Animator.Inline.opacity model.animationState fadeIn
 
-                else
-                    Animator.at 0
-            )
+
+
+-- htmlAttribute <|
+--     Animator.Inline.opacity model.animationState
+--         (\state ->
+--             if state == targetAnimationState || animationComplete then
+--                 Animator.at 1
+--             else
+--                 Animator.at 0
+--         )
 
 
 wordFadeInAnimation : Model -> AnimationState -> Int -> Attribute Msg
@@ -405,6 +463,11 @@ wordFadeInAnimation model targetAnimationState targetWordInListIndex =
     let
         fadeIn state =
             case state of
+                FadeIn ->
+                    -- TODO: Update this properly
+                    Animator.at 0
+                        |> Animator.arriveSmoothly 0.5
+
                 FadeInWord wordIndex currentRow ->
                     case targetAnimationState of
                         FadeInWord _ targetRow ->
@@ -470,6 +533,10 @@ wordAppearAnimation model targetAnimationState targetWordNumber =
         showWord state =
             case state of
                 NotStarted ->
+                    Animator.at 0
+
+                FadeIn ->
+                    -- TODO: Update this properly
                     Animator.at 0
 
                 FadeInLetter _ ->
