@@ -15666,16 +15666,54 @@ var $author$project$Home$view = function (model) {
 			]),
 		$author$project$Home$wrapperView(model));
 };
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
 var $author$project$Lanky$remainingTimeString = function (model) {
 	var totalMilis = model.remainingTime % 1000;
 	var totalHours = model.remainingTime / ((60 * 60) * 1000);
 	var totalMinutes = (totalHours - $elm$core$Basics$floor(totalHours)) * 60;
 	var totalSeconds = (totalMinutes - $elm$core$Basics$floor(totalMinutes)) * 60;
-	var seconds = $elm$core$String$fromInt(
-		$elm$core$Basics$floor(totalSeconds));
-	var minutes = $elm$core$String$fromInt(
-		$elm$core$Basics$floor(totalMinutes));
-	var milis = $elm$core$String$fromInt(totalMilis);
+	var seconds = A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			$elm$core$Basics$floor(totalSeconds)));
+	var minutes = A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			$elm$core$Basics$floor(totalMinutes)));
+	var milis = A3(
+		$elm$core$String$padLeft,
+		3,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(totalMilis));
 	var hours = $elm$core$String$fromInt(
 		$elm$core$Basics$floor(totalHours));
 	return hours + (':' + (minutes + (':' + (seconds + ('.' + milis)))));
@@ -15695,7 +15733,12 @@ var $author$project$Lanky$lankyCountdownLayout = function (model) {
 				A2(
 				$mdgriffith$elm_ui$Element$el,
 				_List_fromArray(
-					[$author$project$Font$handwritingFont, $mdgriffith$elm_ui$Element$centerX]),
+					[
+						$author$project$Font$handwritingFont,
+						$mdgriffith$elm_ui$Element$centerX,
+						$mdgriffith$elm_ui$Element$width(
+						$mdgriffith$elm_ui$Element$px(150))
+					]),
 				$mdgriffith$elm_ui$Element$text(
 					$author$project$Lanky$remainingTimeString(model)))
 			]));

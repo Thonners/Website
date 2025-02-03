@@ -1,9 +1,10 @@
-module Lanky exposing (..)
+module Lanky exposing (Model, Msg(..), dueDate, flooredDiv, init, lankyCountdownLayout, main, remainingTime, remainingTimeString, subscriptions, update, updateEvery, view)
 
 import Browser
-import Element exposing (Element, centerX, centerY, column, el, layout, text)
+import Element exposing (Element, centerX, centerY, column, el, layout, px, text, width)
 import Font exposing (handwritingFont)
 import Html exposing (Html, h1)
+import String exposing (padLeft)
 import Task
 import Time exposing (Posix)
 
@@ -68,18 +69,21 @@ remainingTimeString model =
 
         minutes =
             String.fromInt (floor totalMinutes)
+                |> padLeft 2 '0'
 
         totalSeconds =
             (totalMinutes - toFloat (floor totalMinutes)) * 60
 
         seconds =
             String.fromInt (floor totalSeconds)
+                |> padLeft 2 '0'
 
         totalMilis =
             remainderBy 1000 model.remainingTime
 
         milis =
             String.fromInt totalMilis
+                |> padLeft 3 '0'
     in
     hours ++ ":" ++ minutes ++ ":" ++ seconds ++ "." ++ milis
 
@@ -130,6 +134,7 @@ lankyCountdownLayout model =
         , el
             [ handwritingFont
             , centerX
+            , width (px 150)
             ]
           <|
             text (remainingTimeString model)
